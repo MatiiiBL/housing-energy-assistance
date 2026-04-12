@@ -105,9 +105,13 @@ function getAnthropicClient() {
 async function callAnthropic(systemPrompt, userMessage) {
   const client = getAnthropicClient();
   const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+  const rawMax = Number(process.env.ANTHROPIC_MAX_OUTPUT_TOKENS);
+  // Default 4096: enough for a full program array; 8192 often slows the tail of generation.
+  const max_tokens =
+    Number.isFinite(rawMax) && rawMax >= 1024 ? Math.min(Math.floor(rawMax), 8192) : 4096;
   const msg = await client.messages.create({
     model,
-    max_tokens: 8192,
+    max_tokens,
     temperature: 0.1,
     system: systemPrompt,
     messages: [{ role: 'user', content: userMessage }],

@@ -39,11 +39,15 @@ app.post('/api/assess', async (req, res) => {
 
   const { profile } = data;
   const systemPrompt = buildSystemPrompt(profile.language);
-  const userMessage = JSON.stringify(profile, null, 2);
+  // Compact JSON keeps input tokens smaller; profile is small either way.
+  const userMessage = JSON.stringify(profile);
 
-  // Hackathon / slow-network cushion (Flash is usually fast; prompt is kept short)
+  const assessTimeoutMs = Number(process.env.ASSESS_TIMEOUT_MS);
+  const timeoutMs =
+    Number.isFinite(assessTimeoutMs) && assessTimeoutMs > 0 ? assessTimeoutMs : 120000;
+
   const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('TIMEOUT')), 45000)
+    setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs)
   );
 
   try {

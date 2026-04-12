@@ -30,6 +30,7 @@ const LANGUAGE_NAMES = {
 
 const CASCADE_ADDENDUM = `
 Return only a JSON array (no markdown). Each object: programId (one of: heap_regular, heap_emergency, liheap, snap, medicaid, coned_eal, eap_national_grid, nyserda_weatherization, nyserda_empower, hra_home_energy, solar_for_all, heap_cooling, heap_clean_tune, heap_herr), name, qualifies, confidenceLevel (high|medium|low), alreadyEnrolled, eligibility (likely|possible|unlikely), reason, estimatedValue, estimatedAnnualBenefit (number), applicationUrl (or null), requiredDocuments (array), notes (or null). Mirror profile existingBenefits in alreadyEnrolled.
+Keep each row compact: reason at most two short sentences; notes one short sentence or null; requiredDocuments only what is typical (short strings).
 `;
 
 function buildSystemPrompt(language) {
