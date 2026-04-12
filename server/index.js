@@ -19,13 +19,24 @@ if (process.env.NODE_ENV === 'production') {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+function extractJSON(text) {
+  const cleaned = text
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim();
+  const match = cleaned.match(/\[[\s\S]*\]/);
+  if (match) return JSON.parse(match[0]);
+  return JSON.parse(cleaned);
+}
+
 async function callGemini(systemPrompt, userMessage) {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash-lite',
     systemInstruction: systemPrompt,
   });
   const response = await model.generateContent(userMessage);
-  return response.response.text();
+  return extractJSON(response.response.text());
 }
 
 
@@ -49,7 +60,7 @@ app.post('/api/assess', async (req, res) => {
       callGemini(systemPrompt, userMessage),
       timeoutPromise,
     ]);
-    return res.json({ output });
+    return res.json({ programs: output });
   } catch (err) {
     if (err.message === 'TIMEOUT') {
       console.error('Gemini API timeout');
