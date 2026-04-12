@@ -130,9 +130,14 @@ export default function IntakeForm({ onSubmit, language, onLanguageChange, error
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      {/* Title */}
+      {/* Title + Language */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('intake.title')}</h1>
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h1 className="text-2xl font-bold text-gray-900">{t('intake.title')}</h1>
+          <div className="w-44 flex-shrink-0">
+            <LanguageToggle language={language} onChange={onLanguageChange} />
+          </div>
+        </div>
         <p className="text-sm text-gray-500">{t('intake.subtitle')}</p>
       </div>
 
@@ -360,16 +365,6 @@ export default function IntakeForm({ onSubmit, language, onLanguageChange, error
             );
           })}
         </div>
-      </div>
-
-      {/* Section F: Language */}
-      <SectionLabel>{t('intake.sectionF')}</SectionLabel>
-
-      <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('intake.language')}
-        </label>
-        <LanguageToggle language={language} onChange={onLanguageChange} t={t} />
       </div>
 
       {/* API error */}

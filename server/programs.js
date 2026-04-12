@@ -1,42 +1,106 @@
 const PROGRAMS = [
   {
     id: 'heap_regular',
-    name: 'HEAP Regular Benefit',
+    name: {
+      en: 'HEAP Regular Benefit',
+      es: 'Beneficio Regular HEAP',
+    },
     adminAgency: 'OTDA via HRA',
-    category: 'Direct payment',
-    incomeLimit: '60% of State Median Income (varies by household size). Use web_search to verify current thresholds for the 2025-2026 program year.',
-    categoricalEligibility: 'SNAP, Medicaid, SSI, or TANF enrollment grants automatic categorical eligibility — no separate income verification required.',
-    estimatedValue: '$200–$700/year. Typically $300–$500 for NYC households. Higher amounts for larger households and lower incomes. Use published HEAP benefit tables.',
+    category: {
+      en: 'Direct payment',
+      es: 'Pago directo',
+    },
+    incomeLimit: {
+      en: '60% of State Median Income (varies by household size).',
+      es: '60% del ingreso medio estatal (varía según el tamaño del hogar).',
+    },
+    categoricalEligibility: {
+      en: 'SNAP, Medicaid, SSI, or TANF enrollment grants automatic eligibility.',
+      es: 'La inscripción en SNAP, Medicaid, SSI o TANF otorga elegibilidad automática.',
+    },
+    estimatedValue: {
+      en: '$200–$700/year. Typically $300–$500 for NYC households.',
+      es: '$200–$700/año. Típicamente $300–$500 para hogares en NYC.',
+    },
     applicationUrl: 'https://access.nyc.gov/',
-    applicationMethod: 'Online via ACCESS HRA or in-person at an HRA HEAP office',
-    deadline: 'Typically November through May. Use web_search to verify whether the current HEAP window is open.',
-    requiredDocuments: [
-      'Government-issued photo ID',
-      'Proof of NYC residency (lease, utility bill, or bank statement)',
-      'Proof of income for all household members (pay stubs, Social Security award letters, tax returns)',
-      'Utility account number or heating fuel vendor information',
-      'Social Security numbers for all household members',
-    ],
-    notes: 'Apply as early in the season as possible — funding is exhausted every year before the window closes. SNAP/Medicaid recipients skip income verification.',
+    applicationMethod: {
+      en: 'Online via ACCESS HRA or in-person at an HRA HEAP office',
+      es: 'En línea a través de ACCESS HRA o en persona en una oficina HEAP de HRA',
+    },
+    deadline: {
+      en: 'Typically November through May.',
+      es: 'Generalmente de noviembre a mayo.',
+    },
+    requiredDocuments: {
+      en: [
+        'Government-issued photo ID',
+        'Proof of NYC residency',
+        'Proof of income for all household members',
+        'Utility account number or fuel vendor info',
+        'Social Security numbers for all household members',
+      ],
+      es: [
+        'Identificación con foto emitida por el gobierno',
+        'Prueba de residencia en NYC',
+        'Prueba de ingresos de todos los miembros del hogar',
+        'Número de cuenta de servicios públicos o proveedor de combustible',
+        'Números de Seguro Social de todos los miembros del hogar',
+      ],
+    },
+    notes: {
+      en: 'Apply early — funding runs out every year.',
+      es: 'Solicite temprano — los fondos se agotan cada año.',
+    },
     triggers: [],
     triggeredBy: null,
   },
+
   {
     id: 'heap_emergency',
-    name: 'HEAP Emergency Benefit',
+    name: {
+      en: 'HEAP Emergency Benefit',
+      es: 'Beneficio de Emergencia HEAP',
+    },
     adminAgency: 'OTDA via HRA',
-    category: 'Emergency',
-    incomeLimit: 'Same income limits as HEAP Regular. Requires an active shutoff notice or imminent fuel runout.',
-    categoricalEligibility: 'Same categorical eligibility as HEAP Regular.',
-    estimatedValue: 'Up to $600 one-time emergency payment.',
+    category: {
+      en: 'Emergency',
+      es: 'Emergencia',
+    },
+    incomeLimit: {
+      en: 'Same as HEAP Regular. Requires active shutoff notice.',
+      es: 'Igual que HEAP Regular. Requiere aviso activo de corte.',
+    },
+    categoricalEligibility: {
+      en: 'Same as HEAP Regular.',
+      es: 'Igual que HEAP Regular.',
+    },
+    estimatedValue: {
+      en: 'Up to $600 one-time emergency payment.',
+      es: 'Hasta $600 en un pago único de emergencia.',
+    },
     applicationUrl: 'https://access.nyc.gov/',
-    applicationMethod: 'In-person at an HRA HEAP office (emergency cases receive same-day processing)',
-    deadline: 'Available during HEAP Regular window. Requires an active emergency — cannot be applied for preemptively.',
-    requiredDocuments: [
-      'Active utility shutoff notice or documentation of fuel emergency',
-      'All standard HEAP Regular documents',
-    ],
-    notes: 'CRITICAL WARNING: Cannot apply preemptively. Must have active shutoff notice in hand. HRA offers same-day processing for genuine emergencies.',
+    applicationMethod: {
+      en: 'In-person at an HRA HEAP office',
+      es: 'En persona en una oficina HEAP de HRA',
+    },
+    deadline: {
+      en: 'Available during HEAP season with emergency.',
+      es: 'Disponible durante la temporada HEAP con emergencia.',
+    },
+    requiredDocuments: {
+      en: [
+        'Active utility shutoff notice',
+        'All standard HEAP documents',
+      ],
+      es: [
+        'Aviso activo de corte de servicio',
+        'Todos los documentos estándar de HEAP',
+      ],
+    },
+    notes: {
+      en: 'Cannot apply preemptively — must show active emergency.',
+      es: 'No se puede solicitar de forma preventiva — debe haber una emergencia activa.',
+    },
     triggers: [],
     triggeredBy: null,
   },

@@ -30,7 +30,10 @@ const HouseholdProfileSchema = z.object({
     hasSenior60Plus: z.boolean(),
     hasDisabledMember: z.boolean(),
   }),
-  language: z.enum(['en', 'es']),
+  language: z.enum([
+  'en','es','zh-hans','zh-hant','bn','ru','ht','ko','ar','fr','pl',
+  'ur','tl','it','yi','el','hi','pt','he','vi','ja','sq','am','pa','tr','sw'
+]),
 });
 
 function validateProfile(body) {

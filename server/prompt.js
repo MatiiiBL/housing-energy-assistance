@@ -1,5 +1,34 @@
+const LANGUAGE_NAMES = {
+  'en':      'English',
+  'es':      'Spanish (Español)',
+  'zh-hans': 'Simplified Chinese (简体中文)',
+  'zh-hant': 'Traditional Chinese (繁體中文)',
+  'bn':      'Bengali (বাংলা)',
+  'ru':      'Russian (Русский)',
+  'ht':      'Haitian Creole (Kreyòl ayisyen)',
+  'ko':      'Korean (한국어)',
+  'ar':      'Arabic (العربية)',
+  'fr':      'French (Français)',
+  'pl':      'Polish (Polski)',
+  'ur':      'Urdu (اردو)',
+  'tl':      'Filipino (Tagalog)',
+  'it':      'Italian (Italiano)',
+  'yi':      'Yiddish (ייִדיש)',
+  'el':      'Greek (Ελληνικά)',
+  'hi':      'Hindi (हिन्दी)',
+  'pt':      'Portuguese (Português)',
+  'he':      'Hebrew (עברית)',
+  'vi':      'Vietnamese (Tiếng Việt)',
+  'ja':      'Japanese (日本語)',
+  'sq':      'Albanian (Shqip)',
+  'am':      'Amharic (አማርኛ)',
+  'pa':      'Punjabi (ਪੰਜਾਬੀ)',
+  'tr':      'Turkish (Türkçe)',
+  'sw':      'Swahili (Kiswahili)',
+};
+
 function buildSystemPrompt(language) {
-  const lang = language === 'es' ? 'Spanish (español)' : 'English';
+  const lang = LANGUAGE_NAMES[language] ?? 'English';
   return `You are an energy assistance advisor for New York City households. Given a household profile, identify all energy assistance programs they may be eligible for.
 
 Return ONLY a valid JSON array. No explanation, no markdown, no code fences. Start with [ and end with ].
