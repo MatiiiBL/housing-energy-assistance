@@ -38,9 +38,8 @@ function extractJSON(text) {
 async function callGemini(systemPrompt, userMessage) {
   const makeRequest = (system) => {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.0-flash-lite',
       systemInstruction: system,
-      tools: [{ googleSearch: {} }],
     });
     return model.generateContent(userMessage);
   };
@@ -62,6 +61,7 @@ async function callGemini(systemPrompt, userMessage) {
     return extractJSON(retryText);
   }
 }
+
 
 app.post('/api/assess', async (req, res) => {
   // Validate input
@@ -93,6 +93,7 @@ app.post('/api/assess', async (req, res) => {
       });
     }
 
+    console.error('Raw error:', err.status, err.statusText, err.message);
     if (err.status === 429) {
       return res.status(429).json({
         error: 'Too many requests. Please wait a moment and try again.',
@@ -100,7 +101,7 @@ app.post('/api/assess', async (req, res) => {
       });
     }
 
-    console.error('Assessment error:', err);
+    console.error('Assessment error:', JSON.stringify({ status: err.status, message: err.message, details: err.errorDetails }));
     return res.status(500).json({
       error: 'Something went wrong during the assessment. Please try again.',
       code: 'SERVER_ERROR',
