@@ -108,10 +108,15 @@ app.post('/api/assess', async (req, res) => {
 
     if (err.code === 'MISSING_ANTHROPIC_KEY') {
       console.error('Missing ANTHROPIC_API_KEY (or CLAUDE_API_KEY) for assessment');
-      return res.status(500).json({
+      const payload = {
         error: 'The assessment service is not configured. Please try again later.',
         code: 'LLM_NOT_CONFIGURED',
-      });
+      };
+      if (process.env.NODE_ENV !== 'production') {
+        payload.debug =
+          'Set ANTHROPIC_API_KEY (or CLAUDE_API_KEY) in the project root .env to a real key from https://console.anthropic.com/ — not the placeholder from .env.example — then restart the dev server.';
+      }
+      return res.status(500).json(payload);
     }
 
     console.error('Raw error:', err.status, err.statusText, err.message);
