@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const ASSESSMENT_LANGUAGE_CODES = require('./assessmentLanguages.json');
 
 const HouseholdProfileSchema = z.object({
   householdSize: z
@@ -48,7 +49,7 @@ const HouseholdProfileSchema = z.object({
     hasSenior60Plus: z.boolean(),
     hasDisabledMember: z.boolean(),
   }),
-  language: z.enum(['en', 'es']),
+  language: z.enum(ASSESSMENT_LANGUAGE_CODES),
 });
 
 function validateProfile(body) {

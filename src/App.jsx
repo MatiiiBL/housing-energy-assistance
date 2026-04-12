@@ -22,6 +22,7 @@ function createT(language) {
 export default function App() {
   const [view, setView] = useState('intake'); // 'intake' | 'loading' | 'results'
   const [language, setLanguage] = useState('en');
+  const [assessmentLanguage, setAssessmentLanguage] = useState('en');
   const { assess, loading, error, assessment, reset } = useAssessment();
 
   const t = createT(language);
@@ -29,7 +30,7 @@ export default function App() {
   const handleSubmit = async (profile) => {
     setView('loading');
     try {
-      await assess({ ...profile, language });
+      await assess({ ...profile, language: assessmentLanguage });
       setView('results');
     } catch {
       setView('intake');
@@ -73,7 +74,13 @@ export default function App() {
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {view === 'intake' && (
-          <IntakeForm onSubmit={handleSubmit} language={language} error={error} t={t} />
+          <IntakeForm
+            onSubmit={handleSubmit}
+            assessmentLanguage={assessmentLanguage}
+            onAssessmentLanguageChange={setAssessmentLanguage}
+            error={error}
+            t={t}
+          />
         )}
         {view === 'loading' && <LoadingSkeleton language={language} t={t} />}
         {view === 'results' && assessment && (

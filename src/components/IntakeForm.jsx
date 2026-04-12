@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ASSESSMENT_LANGUAGE_CODES from '../../server/assessmentLanguages.json';
 
 function SectionLabel({ children }) {
   return (
@@ -57,7 +58,13 @@ const INITIAL_FORM = {
   hasDisabledMember: false,
 };
 
-export default function IntakeForm({ onSubmit, language, error, t }) {
+export default function IntakeForm({
+  onSubmit,
+  assessmentLanguage,
+  onAssessmentLanguageChange,
+  error,
+  t,
+}) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [validationErrors, setValidationErrors] = useState({});
 
@@ -140,7 +147,6 @@ export default function IntakeForm({ onSubmit, language, error, t }) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      {/* Title */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('intake.title')}</h1>
         <p className="text-sm text-gray-500">{t('intake.subtitle')}</p>
@@ -370,6 +376,27 @@ export default function IntakeForm({ onSubmit, language, error, t }) {
             );
           })}
         </div>
+      </div>
+
+      <SectionLabel>{t('intake.sectionF')}</SectionLabel>
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="assessment-language">
+          {t('intake.language')}
+        </label>
+        <p className="text-xs text-gray-400 mb-2">{t('intake.language.helper')}</p>
+        <select
+          id="assessment-language"
+          value={assessmentLanguage}
+          onChange={(e) => onAssessmentLanguageChange(e.target.value)}
+          className="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:border-brand-500"
+          style={{ '--tw-ring-color': '#1D9E75' }}
+        >
+          {ASSESSMENT_LANGUAGE_CODES.map((code) => (
+            <option key={code} value={code}>
+              {t(`intake.lang.${code}`)}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* API error */}
