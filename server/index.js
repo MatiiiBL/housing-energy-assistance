@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { validateProfile } = require('./validate.js');
 const { buildSystemPrompt } = require('./prompt.js');
 
@@ -17,16 +17,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '..', 'dist')));
 }
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-function extractText(response) {
-  return response.content
-    .filter((block) => block.type === 'text')
-    .map((block) => block.text)
-    .join('');
-}
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 function extractJSON(text) {
   // Strip markdown code fences if present
@@ -44,19 +35,19 @@ function extractJSON(text) {
   return JSON.parse(cleaned);
 }
 
-async function callClaude(systemPrompt, userMessage) {
-  const makeRequest = (system) =>
-    client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-      system,
-      messages: [{ role: 'user', content: userMessage }],
+async function callGemini(systemPrompt, userMessage) {
+  const makeRequest = (system) => {
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      systemInstruction: system,
+      tools: [{ googleSearch: {} }],
     });
+    return model.generateContent(userMessage);
+  };
 
   // First attempt
   const response = await makeRequest(systemPrompt);
-  const text = extractText(response);
+  const text = response.response.text();
 
   try {
     return extractJSON(text);
@@ -67,7 +58,7 @@ async function callClaude(systemPrompt, userMessage) {
       systemPrompt +
       '\n\nCRITICAL: Your response must start with { and end with }. No other text. Valid JSON only.';
     const retryResponse = await makeRequest(strictSystem);
-    const retryText = extractText(retryResponse);
+    const retryText = retryResponse.response.text();
     return extractJSON(retryText);
   }
 }
@@ -89,13 +80,13 @@ app.post('/api/assess', async (req, res) => {
 
   try {
     const result = await Promise.race([
-      callClaude(systemPrompt, userMessage),
+      callGemini(systemPrompt, userMessage),
       timeoutPromise,
     ]);
     return res.json(result);
   } catch (err) {
     if (err.message === 'TIMEOUT') {
-      console.error('Anthropic API timeout');
+      console.error('Gemini API timeout');
       return res.status(504).json({
         error: 'The assessment is taking longer than expected. Please try again.',
         code: 'TIMEOUT',

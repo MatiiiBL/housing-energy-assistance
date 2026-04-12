@@ -62,7 +62,7 @@ These enrollment triggers MUST be traced and applied:
 === INSTRUCTIONS ===
 
 1. Evaluate EVERY program in the registry. Do not skip any.
-2. Use web_search to verify:
+2. Look up and verify current information about:
    a. Whether the HEAP application window is currently open for the 2025-2026 season
    b. Current HEAP income thresholds for household sizes 1-8 for the 2025-2026 program year
    c. Current EAP enrollment availability for Con Edison and National Grid
