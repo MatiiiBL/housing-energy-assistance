@@ -1,0 +1,113 @@
+const { PROGRAMS } = require('./programs.js');
+
+const NAME_HINTS = [
+  [/heap.*regular|^heap\b(?!.*emergency)/i, 'heap_regular'],
+  [/heap.*emergency|emergency.*heap/i, 'heap_emergency'],
+  [/con edison|con ed|eal|energy affordability.*con/i, 'coned_eal'],
+  [/national grid|eap.*national/i, 'eap_national_grid'],
+  [/solar for all|community solar/i, 'solar_for_all'],
+  [/empower\+|empower plus|nys.*empower/i, 'nyserda_empower'],
+  [/weatherization|wap\b/i, 'nyserda_weatherization'],
+  [/hra.*home|supplemental.*energy/i, 'hra_home_energy'],
+  [/liheap|liheap/i, 'liheap'],
+];
+
+function guessProgramId(name) {
+  if (!name || typeof name !== 'string') return null;
+  for (const [re, id] of NAME_HINTS) {
+    if (re.test(name)) return id;
+  }
+  return null;
+}
+
+function parseEstimatedAnnualBenefit(estimatedValue) {
+  if (estimatedValue == null) return 0;
+  const s = String(estimatedValue);
+  const range = s.match(/\$?\s*([\d,]+)\s*[–-]\s*\$?\s*([\d,]+)/);
+  if (range) {
+    const a = parseInt(range[1].replace(/,/g, ''), 10);
+    const b = parseInt(range[2].replace(/,/g, ''), 10);
+    if (!Number.isNaN(a) && !Number.isNaN(b)) return Math.round((a + b) / 2);
+  }
+  const one = s.match(/\$?\s*([\d,]+)/g);
+  if (one && one.length) {
+    const n = parseInt(one[0].replace(/[$,]/g, ''), 10);
+    return Number.isNaN(n) ? 0 : n;
+  }
+  return 0;
+}
+
+/**
+ * Normalize LLM program rows for UI + cascade resolution.
+ */
+function normalizeProgramsFromLLM(raw) {
+  const arr = Array.isArray(raw) ? raw : [];
+  return arr.map((p, index) => {
+    const eligibility = p.eligibility || 'possible';
+    const qualifies =
+      p.qualifies === true ||
+      p.confidenceLevel === 'high' ||
+      (eligibility === 'likely' && p.confidenceLevel !== 'low');
+    const programId =
+      p.programId || guessProgramId(p.name) || `unknown_${index}`;
+    let estimatedAnnualBenefit =
+      typeof p.estimatedAnnualBenefit === 'number' && !Number.isNaN(p.estimatedAnnualBenefit)
+        ? p.estimatedAnnualBenefit
+        : 0;
+    if (!estimatedAnnualBenefit && p.estimatedValue) {
+      estimatedAnnualBenefit = parseEstimatedAnnualBenefit(p.estimatedValue);
+    }
+    return {
+      ...p,
+      programId,
+      qualifies,
+      confidenceLevel:
+        p.confidenceLevel ||
+        (eligibility === 'likely' ? 'high' : eligibility === 'unlikely' ? 'low' : 'medium'),
+      estimatedAnnualBenefit,
+      alreadyEnrolled: Boolean(p.alreadyEnrolled),
+    };
+  });
+}
+
+function getQualifiedIdsForCascades(programs, profile) {
+  const ids = new Set();
+  for (const p of programs || []) {
+    if (!p.programId || String(p.programId).startsWith('unknown_')) continue;
+    const high =
+      p.qualifies === true ||
+      p.confidenceLevel === 'high' ||
+      (p.eligibility === 'likely' && p.confidenceLevel !== 'low');
+    if (high) ids.add(p.programId);
+    if (p.alreadyEnrolled) ids.add(p.programId);
+  }
+  const enrolled = profile.existingBenefits || [];
+  for (const b of enrolled) {
+    if (b && b !== 'none') ids.add(b);
+  }
+  return [...ids];
+}
+
+function sumBaseValue(programs) {
+  return (programs || []).reduce((sum, p) => {
+    if (!p.qualifies && p.confidenceLevel !== 'high' && p.eligibility !== 'likely') return sum;
+    const v = typeof p.estimatedAnnualBenefit === 'number' ? p.estimatedAnnualBenefit : 0;
+    return sum + v;
+  }, 0);
+}
+
+function buildProgramCatalog() {
+  return PROGRAMS.map((p) => ({
+    programId: p.id,
+    programName: p.name,
+  }));
+}
+
+module.exports = {
+  guessProgramId,
+  normalizeProgramsFromLLM,
+  getQualifiedIdsForCascades,
+  sumBaseValue,
+  buildProgramCatalog,
+  parseEstimatedAnnualBenefit,
+};
