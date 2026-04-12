@@ -55,7 +55,7 @@ app.post('/api/assess', async (req, res) => {
       runAssessmentModel(systemPrompt, userMessage),
       timeoutPromise,
     ]);
-    const programs = normalizeProgramsFromLLM(output);
+    const programs = normalizeProgramsFromLLM(output, profile.language);
     const allTriggerIds = getQualifiedIdsForCascades(programs, profile);
     const cascadeChains = resolveCascades(allTriggerIds);
     const totalBaseValue = sumBaseValue(programs);
@@ -99,7 +99,7 @@ app.post('/api/assess', async (req, res) => {
       totalBaseValue,
       totalCascadeValue,
       totalEstimatedAnnualSavings: totalBaseValue + totalCascadeValue,
-      programCatalog: buildProgramCatalog(),
+      programCatalog: buildProgramCatalog(profile.language),
     });
   } catch (err) {
     if (err.message === 'TIMEOUT') {

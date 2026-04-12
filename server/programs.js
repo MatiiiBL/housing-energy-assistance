@@ -4,7 +4,10 @@
 const PROGRAMS = [
   {
     id: 'heap_regular',
-    name: 'HEAP Regular Benefit',
+    name: {
+      en: 'HEAP Regular Benefit',
+      es: 'Beneficio Regular HEAP',
+    },
     adminAgency: 'OTDA via HRA',
     category: 'Direct payment',
     incomeLimit:
@@ -28,14 +31,30 @@ const PROGRAMS = [
     triggers: [],
     triggeredBy: null,
   },
+
   {
     id: 'heap_emergency',
-    name: 'HEAP Emergency Benefit',
+    name: {
+      en: 'HEAP Emergency Benefit',
+      es: 'Beneficio de Emergencia HEAP',
+    },
     adminAgency: 'OTDA via HRA',
-    category: 'Emergency',
-    incomeLimit: 'Same as HEAP Regular. Requires active shutoff notice.',
-    categoricalEligibility: 'Same as HEAP Regular.',
-    estimatedValue: 'Up to $600 one-time emergency payment.',
+    category: {
+      en: 'Emergency',
+      es: 'Emergencia',
+    },
+    incomeLimit: {
+      en: 'Same as HEAP Regular. Requires active shutoff notice.',
+      es: 'Igual que HEAP Regular. Requiere aviso activo de corte.',
+    },
+    categoricalEligibility: {
+      en: 'Same as HEAP Regular.',
+      es: 'Igual que HEAP Regular.',
+    },
+    estimatedValue: {
+      en: 'Up to $600 one-time emergency payment.',
+      es: 'Hasta $600 en un pago único de emergencia.',
+    },
     applicationUrl: 'https://access.nyc.gov/',
     applicationMethod: 'In-person at an HRA HEAP office (emergency cases receive same-day processing)',
     deadline: 'Available during HEAP Regular window.',

@@ -1,5 +1,25 @@
 const { PROGRAMS } = require('./programs.js');
 
+/**
+ * Catalog fields may be plain strings or { en, es } objects. Prefer the requested
+ * locale, then en, then es, then any string value.
+ */
+function resolveLocalizedString(value, preferredLocale = 'en') {
+  if (value == null) return '';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const keys = [preferredLocale, 'en', 'es'];
+    for (const k of keys) {
+      if (value[k] != null && typeof value[k] === 'string') return value[k];
+    }
+    const first = Object.values(value).find((v) => typeof v === 'string');
+    return first != null ? first : '';
+  }
+  return String(value);
+}
+
 const NAME_HINTS = [
   [/heap.*regular|^heap\b(?!.*emergency)/i, 'heap_regular'],
   [/heap.*emergency|emergency.*heap/i, 'heap_emergency'],
@@ -13,16 +33,18 @@ const NAME_HINTS = [
 ];
 
 function guessProgramId(name) {
-  if (!name || typeof name !== 'string') return null;
+  const nameStr = resolveLocalizedString(name, 'en');
+  if (!nameStr) return null;
   for (const [re, id] of NAME_HINTS) {
-    if (re.test(name)) return id;
+    if (re.test(nameStr)) return id;
   }
   return null;
 }
 
 function parseEstimatedAnnualBenefit(estimatedValue) {
   if (estimatedValue == null) return 0;
-  const s = String(estimatedValue);
+  const s = resolveLocalizedString(estimatedValue, 'en');
+  if (!s) return 0;
   const range = s.match(/\$?\s*([\d,]+)\s*[–-]\s*\$?\s*([\d,]+)/);
   if (range) {
     const a = parseInt(range[1].replace(/,/g, ''), 10);
@@ -39,8 +61,10 @@ function parseEstimatedAnnualBenefit(estimatedValue) {
 
 /**
  * Normalize LLM program rows for UI + cascade resolution.
+ * @param {string} [language] — assessment output language (matches intake `language`); used to unwrap {en,es} fields if the model returns them.
  */
-function normalizeProgramsFromLLM(raw) {
+function normalizeProgramsFromLLM(raw, language = 'en') {
+  const locale = language || 'en';
   const arr = Array.isArray(raw) ? raw : [];
   return arr.map((p, index) => {
     const eligibility = p.eligibility || 'possible';
@@ -57,8 +81,18 @@ function normalizeProgramsFromLLM(raw) {
     if (!estimatedAnnualBenefit && p.estimatedValue) {
       estimatedAnnualBenefit = parseEstimatedAnnualBenefit(p.estimatedValue);
     }
+    const name = resolveLocalizedString(p.name, locale);
+    const estimatedValue =
+      p.estimatedValue != null && p.estimatedValue !== ''
+        ? resolveLocalizedString(p.estimatedValue, locale)
+        : p.estimatedValue;
+    const notes =
+      p.notes != null && p.notes !== '' ? resolveLocalizedString(p.notes, locale) : p.notes;
     return {
       ...p,
+      name,
+      estimatedValue,
+      notes,
       programId,
       qualifies,
       confidenceLevel:
@@ -96,14 +130,16 @@ function sumBaseValue(programs) {
   }, 0);
 }
 
-function buildProgramCatalog() {
+function buildProgramCatalog(language = 'en') {
+  const locale = language || 'en';
   return PROGRAMS.map((p) => ({
     programId: p.id,
-    programName: p.name,
+    programName: resolveLocalizedString(p.name, locale),
   }));
 }
 
 module.exports = {
+  resolveLocalizedString,
   guessProgramId,
   normalizeProgramsFromLLM,
   getQualifiedIdsForCascades,
