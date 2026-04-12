@@ -64,7 +64,7 @@ function validateProfile(body) {
 }
 
 /**
- * Validates POST /api/assess body. Assessments use Gemini on the server; not configurable per request.
+ * Validates POST /api/assess body. Assessments use Claude (Anthropic) on the server; not configurable per request.
  */
 function validateAssessRequest(body) {
   if (body == null || typeof body !== 'object' || Array.isArray(body)) {

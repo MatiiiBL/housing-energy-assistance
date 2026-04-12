@@ -15,19 +15,18 @@ function isPlaceholderSecret(value) {
 }
 
 /**
- * Prefer GEMINI_API_KEY; otherwise GOOGLE_API_KEY (some docs use that name for the same AI Studio key).
- * Ignores placeholder values like your_*_here.
+ * Prefer ANTHROPIC_API_KEY; otherwise CLAUDE_API_KEY.
  */
-function resolveGeminiApiKey() {
-  const g = process.env.GEMINI_API_KEY;
-  const o = process.env.GOOGLE_API_KEY;
-  if (!isPlaceholderSecret(g)) return String(g).trim();
-  if (!isPlaceholderSecret(o)) return String(o).trim();
+function resolveAnthropicApiKey() {
+  const a = process.env.ANTHROPIC_API_KEY;
+  const c = process.env.CLAUDE_API_KEY;
+  if (!isPlaceholderSecret(a)) return String(a).trim();
+  if (!isPlaceholderSecret(c)) return String(c).trim();
   return null;
 }
 
-function hasGeminiKey() {
-  return resolveGeminiApiKey() != null;
+function hasAnthropicKey() {
+  return resolveAnthropicApiKey() != null;
 }
 
 function resolveEnvPath() {
@@ -39,28 +38,28 @@ function logEnvHint() {
   if (!fs.existsSync(envPath)) {
     console.warn(
       `[energy-navigator] No .env file found at ${envPath}\n` +
-        '  Copy .env.example to .env in the project root, add GEMINI_API_KEY (and optional keys), then restart the server.'
+        '  Copy .env.example to .env in the project root, add ANTHROPIC_API_KEY (and optional keys), then restart the server.'
     );
   }
 }
 
 /** Warn at startup if assessments will fail — does not print key material. */
-function logGeminiKeyHint() {
-  if (hasGeminiKey()) return;
+function logAnthropicKeyHint() {
+  if (hasAnthropicKey()) return;
   const envPath = resolveEnvPath();
   const hasFile = fs.existsSync(envPath);
   console.warn(
-    '[energy-navigator] No valid Gemini API key: set GEMINI_API_KEY (or GOOGLE_API_KEY) to a real key, not the .env.example placeholder.\n' +
-      '  Create a key: https://aistudio.google.com/apikey — then restart the server.\n' +
+    '[energy-navigator] No valid Anthropic API key: set ANTHROPIC_API_KEY (or CLAUDE_API_KEY) to a real key, not the .env.example placeholder.\n' +
+      '  Create a key: https://console.anthropic.com/ — then restart the server.\n' +
       (hasFile ? `  (Env file: ${envPath})` : '')
   );
 }
 
 module.exports = {
   isPlaceholderSecret,
-  hasGeminiKey,
-  resolveGeminiApiKey,
+  hasAnthropicKey,
+  resolveAnthropicApiKey,
   resolveEnvPath,
   logEnvHint,
-  logGeminiKeyHint,
+  logAnthropicKeyHint,
 };

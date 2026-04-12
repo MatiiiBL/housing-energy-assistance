@@ -1,10 +1,10 @@
 const path = require('path');
 const dotenv = require('dotenv');
-const { resolveEnvPath, logEnvHint, logGeminiKeyHint } = require('./envUtils.js');
+const { resolveEnvPath, logEnvHint, logAnthropicKeyHint } = require('./envUtils.js');
 
 dotenv.config({ path: resolveEnvPath() });
 logEnvHint();
-logGeminiKeyHint();
+logAnthropicKeyHint();
 
 const express = require('express');
 const cors = require('cors');
@@ -89,7 +89,7 @@ app.post('/api/assess', async (req, res) => {
 
     return res.json({
       programs,
-      llm: { provider: 'gemini' },
+      llm: { provider: 'claude' },
       cascadeChains,
       liveEnrichment,
       totalBaseValue,
@@ -106,8 +106,8 @@ app.post('/api/assess', async (req, res) => {
       });
     }
 
-    if (err.code === 'MISSING_GEMINI_KEY') {
-      console.error('Missing GEMINI_API_KEY for assessment');
+    if (err.code === 'MISSING_ANTHROPIC_KEY') {
+      console.error('Missing ANTHROPIC_API_KEY (or CLAUDE_API_KEY) for assessment');
       return res.status(500).json({
         error: 'The assessment service is not configured. Please try again later.',
         code: 'LLM_NOT_CONFIGURED',
@@ -177,7 +177,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const server = app.listen(PORT, () => {
   console.log(`Energy Navigator server running on http://localhost:${PORT}`);
-  console.log('LLM backend: Gemini (Google AI)');
+  console.log('LLM backend: Claude (Anthropic) — default model claude-sonnet-4-6');
 });
 
 server.on('error', (err) => {

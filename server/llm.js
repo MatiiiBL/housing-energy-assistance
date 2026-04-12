@@ -1,59 +1,131 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { resolveGeminiApiKey } = require('./envUtils.js');
+const Anthropic = require('@anthropic-ai/sdk');
+const { resolveAnthropicApiKey } = require('./envUtils.js');
 
-function extractJSON(text) {
-  const cleaned = text
+function stripFences(text) {
+  return String(text || '')
     .replace(/^```json\s*/i, '')
     .replace(/^```\s*/i, '')
     .replace(/```\s*$/i, '')
     .trim();
-  const match = cleaned.match(/\[[\s\S]*\]/);
-  if (match) return JSON.parse(match[0]);
-  return JSON.parse(cleaned);
 }
 
-let geminiClient = null;
-let geminiClientForKey = null;
+function stripTrailingCommas(json) {
+  return json.replace(/,\s*([}\]])/g, '$1');
+}
 
-function getGeminiClient() {
-  const key = resolveGeminiApiKey();
+function extractBalancedArray(raw) {
+  const s = stripFences(raw);
+  const start = s.indexOf('[');
+  if (start === -1) return null;
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let i = start; i < s.length; i++) {
+    const c = s[i];
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (inString) {
+      if (c === '\\') {
+        escape = true;
+        continue;
+      }
+      if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') {
+      inString = true;
+      continue;
+    }
+    if (c === '[') depth++;
+    else if (c === ']') {
+      depth--;
+      if (depth === 0) return s.slice(start, i + 1);
+    }
+  }
+  return null;
+}
+
+function parseJsonLenient(slice) {
+  return JSON.parse(stripTrailingCommas(slice.trim()));
+}
+
+function extractJSON(text) {
+  const cleaned = stripFences(text);
+  const attempts = [];
+  const balanced = extractBalancedArray(cleaned);
+  if (balanced) attempts.push(balanced);
+  if (!attempts.includes(cleaned)) attempts.push(cleaned);
+
+  let lastErr;
+  for (const chunk of attempts) {
+    try {
+      const parsed = parseJsonLenient(chunk);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && Array.isArray(parsed.programs)) return parsed.programs;
+      if (parsed && Array.isArray(parsed.items)) return parsed.items;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  const match = cleaned.match(/\[[\s\S]*\]/);
+  if (match) {
+    try {
+      const parsed = parseJsonLenient(match[0]);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed?.programs) return parsed.programs;
+      if (parsed?.items) return parsed.items;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  throw lastErr || new Error('Could not parse model output as JSON array');
+}
+
+let anthropicClient = null;
+let anthropicClientForKey = null;
+
+function getAnthropicClient() {
+  const key = resolveAnthropicApiKey();
   if (!key) {
-    const err = new Error('GEMINI_API_KEY (or GOOGLE_API_KEY) is not set or invalid');
-    err.code = 'MISSING_GEMINI_KEY';
+    const err = new Error('ANTHROPIC_API_KEY (or CLAUDE_API_KEY) is not set or invalid');
+    err.code = 'MISSING_ANTHROPIC_KEY';
     throw err;
   }
-  if (!geminiClient || geminiClientForKey !== key) {
-    geminiClient = new GoogleGenerativeAI(key);
-    geminiClientForKey = key;
+  if (!anthropicClient || anthropicClientForKey !== key) {
+    anthropicClient = new Anthropic({ apiKey: key });
+    anthropicClientForKey = key;
   }
-  return geminiClient;
+  return anthropicClient;
 }
 
-async function callGemini(systemPrompt, userMessage) {
-  const genAI = getGeminiClient();
-  const modelName = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    systemInstruction: systemPrompt,
-    generationConfig: {
-      maxOutputTokens: 8192,
-      temperature: 0.2,
-    },
+async function callAnthropic(systemPrompt, userMessage) {
+  const client = getAnthropicClient();
+  const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+  const msg = await client.messages.create({
+    model,
+    max_tokens: 8192,
+    temperature: 0.1,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: userMessage }],
   });
-  const result = await model.generateContent(userMessage);
-  const text = result.response.text();
+  const block = msg.content.find((b) => b.type === 'text');
+  const text = block && block.type === 'text' ? block.text : '';
+  if (!text) {
+    throw new Error('Claude returned no text content');
+  }
   return extractJSON(text);
 }
 
-/**
- * Runs the assessment prompt against Gemini (Google AI).
- */
 async function runAssessmentModel(systemPrompt, userMessage) {
-  return callGemini(systemPrompt, userMessage);
+  return callAnthropic(systemPrompt, userMessage);
 }
 
 module.exports = {
   extractJSON,
-  callGemini,
+  callAnthropic,
   runAssessmentModel,
 };

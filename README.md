@@ -11,7 +11,7 @@ A full-stack web app that helps New York City households discover energy assista
 - **Bilingual UI** — English and Spanish copy via `src/i18n/`.
 - **Validated intake** — Server-side validation with [Zod](https://zod.dev/) (`server/validate.js`).
 - **Program assessment API** — `POST /api/assess` uses a system prompt (`server/prompt.js`) and returns a JSON array of program suggestions.
-- **Gemini (Google AI)** — Set `GEMINI_API_KEY` in `.env` (see [Environment variables](#environment-variables)).
+- **Claude (Anthropic)** — Set `ANTHROPIC_API_KEY` (or `CLAUDE_API_KEY`) in `.env` (see [Environment variables](#environment-variables)).
 - **Linkup search API** — `POST /api/linkup/search` proxies to [Linkup](https://www.linkup.so/) for web search–style queries (API key required).
 - **Cascade chain tracing (WattsGood)** — Static trigger→unlock graph in `server/cascades.js`, resolved after each assessment. Results show visual chains above the flat program list. Optional Linkup `sourcedAnswer` enrichment when `LINKUP_API_KEY` is set.
 
@@ -24,7 +24,7 @@ A full-stack web app that helps New York City households discover energy assista
 | Frontend | React 18, Vite 5, Tailwind CSS |
 | Backend | Node.js, Express |
 | Validation | Zod |
-| LLMs | Google Gemini (`@google/generative-ai`) |
+| LLMs | Anthropic Claude (`@anthropic-ai/sdk`, default `claude-sonnet-4-6`) |
 | Search | Linkup HTTP API (`https://api.linkup.so/v1/search`) |
 
 ---
@@ -34,7 +34,7 @@ A full-stack web app that helps New York City households discover energy assista
 ```
 ├── server/
 │   ├── index.js      # Express app, routes, production static hosting
-│   ├── llm.js        # Gemini assessment runner
+│   ├── llm.js        # Claude (Anthropic) assessment runner
 │   ├── linkup.js     # Linkup search client
 │   ├── prompt.js     # System prompt for assessments
 │   ├── validate.js   # Request body schema for /api/assess
@@ -102,9 +102,9 @@ A full-stack web app that helps New York City households discover energy assista
 |----------|----------------|-------------|
 | `PORT` | Server | HTTP port (default `3001`). |
 | `NODE_ENV` | Build / serve | Use `production` when serving the built SPA from Express. |
-| `GEMINI_API_KEY` | `/api/assess` | [Google AI Studio](https://aistudio.google.com/apikey) / Gemini API key. |
-| `GOOGLE_API_KEY` | Optional | Same key as `GEMINI_API_KEY` if you already use this variable name; do not use the `.env.example` placeholder text. |
-| `GEMINI_MODEL` | Optional | Model id (default `gemini-3-flash-preview`). See [Gemini models](https://ai.google.dev/gemini-api/docs/models). |
+| `ANTHROPIC_API_KEY` | `/api/assess` | [Anthropic Console](https://console.anthropic.com/) API key. |
+| `CLAUDE_API_KEY` | Optional | Alias for `ANTHROPIC_API_KEY`. |
+| `ANTHROPIC_MODEL` | Optional | Model id (default `claude-sonnet-4-6`). See [Anthropic models](https://docs.anthropic.com/en/docs/about-claude/models). |
 | `LINKUP_API_KEY` | `/api/linkup/search` | Bearer token from Linkup. |
 
 ---
@@ -162,12 +162,12 @@ Runs the eligibility-style assessment.
 - `householdMembers`: `{ hasChildUnder6, hasSenior60Plus, hasDisabledMember }`
 - `language`: `en` | `es`
 
-Assessments use **Gemini** on the server (default **Gemini 3 Flash** preview); the client does not select a model.
+Assessments use **Claude (Anthropic)** on the server (default **Claude Sonnet 4.6**); the client does not select a model.
 
 **Success:** `200` with:
 
 - `programs` — normalized rows (`programId`, `qualifies`, `confidenceLevel`, `estimatedAnnualBenefit`, plus display fields).
-- `llm` — `{ "provider": "gemini" }`.
+- `llm` — `{ "provider": "claude" }`.
 - `cascadeChains` — ordered paths from `resolveCascades()` (trigger enrollments + qualified program ids).
 - `totalBaseValue`, `totalCascadeValue`, `totalEstimatedAnnualSavings` — numbers for the UI.
 - `programCatalog` — `{ programId, programName }[]` from `server/programs.js`.
@@ -210,7 +210,7 @@ curl -s -X POST "http://localhost:3001/api/linkup/search" \
 
 ## Production build
 
-1. Set production env vars (including `GEMINI_API_KEY`).
+1. Set production env vars (including `ANTHROPIC_API_KEY` or `CLAUDE_API_KEY`).
 2. `npm run build`
 3. `npm start` (or run `node server/index.js` with `NODE_ENV=production`)
 
