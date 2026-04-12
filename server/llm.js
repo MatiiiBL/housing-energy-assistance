@@ -48,7 +48,13 @@ function extractBalancedArray(raw) {
 }
 
 function parseJsonLenient(slice) {
-  return JSON.parse(stripTrailingCommas(slice.trim()));
+  const t = stripTrailingCommas(String(slice).trim());
+  if (!t) {
+    const err = new Error('Empty JSON segment in model output');
+    err.code = 'MODEL_JSON_EMPTY';
+    throw err;
+  }
+  return JSON.parse(t);
 }
 
 function extractJSON(text) {

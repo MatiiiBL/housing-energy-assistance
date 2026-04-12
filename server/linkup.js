@@ -42,11 +42,14 @@ async function searchLinkup(params) {
     }),
   });
 
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    data = {};
+  const rawText = await res.text();
+  let data = {};
+  if (rawText.trim()) {
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      data = {};
+    }
   }
 
   if (!res.ok) {

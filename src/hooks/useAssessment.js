@@ -15,7 +15,22 @@ export function useAssessment() {
         body: JSON.stringify(profile),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      if (!text.trim()) {
+        throw new Error(
+          response.ok
+            ? 'Empty response from server. Please try again.'
+            : `Cannot reach the assessment API (HTTP ${response.status}). Check that the backend is running and PORT in .env matches the Vite proxy.`
+        );
+      }
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(
+          `Invalid response from server (HTTP ${response.status}). If the backend crashed, check the server terminal.`
+        );
+      }
 
       if (!response.ok) {
         const parts = [data.error, data.debug].filter(Boolean);
