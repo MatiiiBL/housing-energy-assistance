@@ -19,47 +19,13 @@ if (process.env.NODE_ENV === 'production') {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-function extractJSON(text) {
-  // Strip markdown code fences if present
-  let cleaned = text
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```\s*$/i, '')
-    .trim();
-
-  // Try to find a JSON object
-  const match = cleaned.match(/\{[\s\S]*\}/);
-  if (match) {
-    return JSON.parse(match[0]);
-  }
-  return JSON.parse(cleaned);
-}
-
 async function callGemini(systemPrompt, userMessage) {
-  const makeRequest = (system) => {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-lite',
-      systemInstruction: system,
-    });
-    return model.generateContent(userMessage);
-  };
-
-  // First attempt
-  const response = await makeRequest(systemPrompt);
-  const text = response.response.text();
-
-  try {
-    return extractJSON(text);
-  } catch (firstErr) {
-    console.warn('First JSON parse failed, retrying with strict prompt:', firstErr.message);
-    // Retry with stricter prompt
-    const strictSystem =
-      systemPrompt +
-      '\n\nCRITICAL: Your response must start with { and end with }. No other text. Valid JSON only.';
-    const retryResponse = await makeRequest(strictSystem);
-    const retryText = retryResponse.response.text();
-    return extractJSON(retryText);
-  }
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash-lite',
+    systemInstruction: systemPrompt,
+  });
+  const response = await model.generateContent(userMessage);
+  return response.response.text();
 }
 
 
@@ -79,11 +45,11 @@ app.post('/api/assess', async (req, res) => {
   );
 
   try {
-    const result = await Promise.race([
+    const output = await Promise.race([
       callGemini(systemPrompt, userMessage),
       timeoutPromise,
     ]);
-    return res.json(result);
+    return res.json({ output });
   } catch (err) {
     if (err.message === 'TIMEOUT') {
       console.error('Gemini API timeout');

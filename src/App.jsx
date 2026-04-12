@@ -71,9 +71,7 @@ export default function App() {
         {view === 'results' && assessment && (
           <ResultsView
             assessment={assessment}
-            language={language}
             onStartOver={handleStartOver}
-            t={t}
           />
         )}
       </main>
