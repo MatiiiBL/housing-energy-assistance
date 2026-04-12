@@ -8,9 +8,9 @@ import es from './i18n/es.json';
 
 const translations = { en, es };
 
-function createT() {
+function createT(language) {
   return (key, vars = {}) => {
-    const text = translations['en']?.[key] ?? key;
+    const text = translations[language]?.[key] ?? key;
     return Object.entries(vars).reduce(
       (str, [k, v]) => str.replace(`{${k}}`, String(v)),
       text
@@ -23,7 +23,7 @@ export default function App() {
   const [language, setLanguage] = useState('en');
   const { assess, loading, error, assessment, reset } = useAssessment();
 
-  const t = createT();
+  const t = createT(language);
 
   const handleSubmit = async (profile) => {
     setView('loading');
@@ -71,7 +71,9 @@ export default function App() {
         {view === 'results' && assessment && (
           <ResultsView
             assessment={assessment}
+            language={language}
             onStartOver={handleStartOver}
+            t={t}
           />
         )}
       </main>
