@@ -1,0 +1,97 @@
+{
+  "intake.title": "Encuentra Tus Programas de Asistencia Energética",
+  "intake.subtitle": "Responde algunas preguntas para descubrir todos los programas de asistencia energética de NYC para los que califica tu hogar.",
+
+  "intake.sectionA": "Composición del Hogar",
+  "intake.householdSize": "Tamaño del hogar",
+  "intake.householdSize.plus": "5+",
+  "intake.householdSize.exact": "Tamaño exacto del hogar",
+  "intake.childUnder6": "Tiene un niño menor de 6 años",
+  "intake.senior60Plus": "Tiene un miembro de 60 años o más",
+  "intake.disabledMember": "Tiene un miembro del hogar con discapacidad",
+
+  "intake.sectionB": "Ingresos",
+  "intake.annualIncome": "Ingresos anuales del hogar",
+  "intake.annualIncome.helper": "Incluye todas las fuentes antes de impuestos (salarios, beneficios, Seguro Social, etc.)",
+  "intake.annualIncome.placeholder": "ej. 38000",
+
+  "intake.sectionC": "Ubicación y Vivienda",
+  "intake.borough": "Condado (Borough)",
+  "intake.borough.placeholder": "Selecciona el condado",
+  "intake.housingType": "Tipo de vivienda",
+  "intake.housingType.placeholder": "Selecciona el tipo de vivienda",
+
+  "intake.sectionD": "Servicio Eléctrico",
+  "intake.utilityProvider": "Proveedor de servicios",
+  "intake.utilityProvider.placeholder": "Selecciona el proveedor",
+  "intake.monthlyBill": "Estimado de factura mensual de energía",
+  "intake.monthlyBill.perMonth": "/mes",
+
+  "intake.sectionE": "Beneficios Existentes",
+  "intake.existingBenefits": "¿Estás inscrito actualmente en alguno de estos programas?",
+  "intake.existingBenefits.helper": "Selecciona todos los que apliquen. Los beneficios existentes pueden calificarte automáticamente para programas adicionales.",
+
+  "intake.sectionF": "Idioma",
+  "intake.language": "Idioma preferido para los resultados",
+
+  "intake.submit": "Encontrar mis programas",
+
+  "intake.boroughs.bronx": "El Bronx",
+  "intake.boroughs.brooklyn": "Brooklyn",
+  "intake.boroughs.manhattan": "Manhattan",
+  "intake.boroughs.queens": "Queens",
+  "intake.boroughs.staten_island": "Staten Island",
+
+  "intake.housing.renter_heat_included": "Inquilino — calefacción incluida en la renta",
+  "intake.housing.renter_pay_utilities": "Inquilino — pago mis propios servicios",
+  "intake.housing.homeowner": "Propietario",
+  "intake.housing.public_housing": "Vivienda pública (NYCHA)",
+
+  "intake.utility.con_edison": "Con Edison",
+  "intake.utility.national_grid": "National Grid",
+  "intake.utility.nyseg": "NYSEG",
+  "intake.utility.other": "Otro / No sé",
+
+  "intake.benefits.snap": "SNAP",
+  "intake.benefits.medicaid": "Medicaid",
+  "intake.benefits.ssi": "SSI",
+  "intake.benefits.tanf": "TANF",
+  "intake.benefits.none": "Ninguno",
+
+  "intake.lang.en": "English",
+  "intake.lang.es": "Español",
+
+  "results.title": "Tus Resultados de Asistencia Energética",
+  "results.programs_found": "Programas encontrados",
+  "results.annual_savings": "Ahorro anual estimado",
+  "results.cascade_links": "Vínculos en cascada",
+
+  "results.likely": "Probablemente elegible",
+  "results.possible": "Posiblemente elegible",
+  "results.unlikely": "Poco probable",
+  "results.auto": "Inscripción automática",
+
+  "results.est_value": "Est. {amount}/año",
+  "results.required_docs": "Documentos requeridos",
+  "results.hide_docs": "Ocultar documentos",
+  "results.apply_now": "Solicitar ahora",
+  "results.deadline": "Fecha límite",
+  "results.triggered_by": "Inscripción automática vía",
+  "results.cascade_connector": "activa inscripción en ↓",
+  "results.caseworker_tip": "Consejo del trabajador social",
+
+  "results.cascade_banner_title": "Cascada de inscripciones detectada",
+  "results.warnings_title": "Advertencias Importantes",
+
+  "results.disclaimer": "Esto no es asesoramiento legal ni financiero. Las evaluaciones de elegibilidad son estimaciones basadas en las pautas públicas del programa. Confirme la elegibilidad directamente con cada programa antes de solicitar.",
+  "results.start_over": "Comenzar de nuevo",
+
+  "loading.title": "Verificando {count} programas en {agencies} agencias...",
+  "loading.msg0": "Verificando la ventana de solicitud actual de HEAP...",
+  "loading.msg1": "Comprobando los umbrales de ingresos para este año del programa...",
+  "loading.msg2": "Evaluando programas de Con Edison y National Grid...",
+  "loading.msg3": "Rastreando cadenas de inscripción en cascada...",
+  "loading.msg4": "Identificando documentos requeridos...",
+  "loading.msg5": "Calculando el ahorro anual estimado...",
+  "loading.msg6": "Finalizando tus resultados personalizados..."
+}

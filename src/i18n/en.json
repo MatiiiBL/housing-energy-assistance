@@ -1,0 +1,97 @@
+{
+  "intake.title": "Find Your Energy Assistance Programs",
+  "intake.subtitle": "Answer a few questions to discover every NYC energy assistance program your household qualifies for.",
+
+  "intake.sectionA": "Household Composition",
+  "intake.householdSize": "Household size",
+  "intake.householdSize.plus": "5+",
+  "intake.householdSize.exact": "Exact household size",
+  "intake.childUnder6": "Has a child under age 6",
+  "intake.senior60Plus": "Has a member age 60 or older",
+  "intake.disabledMember": "Has a disabled household member",
+
+  "intake.sectionB": "Income",
+  "intake.annualIncome": "Annual household income",
+  "intake.annualIncome.helper": "Include all sources before taxes (wages, benefits, Social Security, etc.)",
+  "intake.annualIncome.placeholder": "e.g. 38000",
+
+  "intake.sectionC": "Location & Housing",
+  "intake.borough": "Borough",
+  "intake.borough.placeholder": "Select borough",
+  "intake.housingType": "Housing type",
+  "intake.housingType.placeholder": "Select housing type",
+
+  "intake.sectionD": "Utility",
+  "intake.utilityProvider": "Utility provider",
+  "intake.utilityProvider.placeholder": "Select provider",
+  "intake.monthlyBill": "Monthly energy bill estimate",
+  "intake.monthlyBill.perMonth": "/month",
+
+  "intake.sectionE": "Existing Benefits",
+  "intake.existingBenefits": "Are you currently enrolled in any of these programs?",
+  "intake.existingBenefits.helper": "Select all that apply. Existing benefits can qualify you for additional programs automatically.",
+
+  "intake.sectionF": "Language",
+  "intake.language": "Preferred language for results",
+
+  "intake.submit": "Find my programs",
+
+  "intake.boroughs.bronx": "Bronx",
+  "intake.boroughs.brooklyn": "Brooklyn",
+  "intake.boroughs.manhattan": "Manhattan",
+  "intake.boroughs.queens": "Queens",
+  "intake.boroughs.staten_island": "Staten Island",
+
+  "intake.housing.renter_heat_included": "Renter — heat included in rent",
+  "intake.housing.renter_pay_utilities": "Renter — I pay my own utilities",
+  "intake.housing.homeowner": "Homeowner",
+  "intake.housing.public_housing": "Public housing (NYCHA)",
+
+  "intake.utility.con_edison": "Con Edison",
+  "intake.utility.national_grid": "National Grid",
+  "intake.utility.nyseg": "NYSEG",
+  "intake.utility.other": "Other / Unknown",
+
+  "intake.benefits.snap": "SNAP",
+  "intake.benefits.medicaid": "Medicaid",
+  "intake.benefits.ssi": "SSI",
+  "intake.benefits.tanf": "TANF",
+  "intake.benefits.none": "None",
+
+  "intake.lang.en": "English",
+  "intake.lang.es": "Español",
+
+  "results.title": "Your Energy Assistance Results",
+  "results.programs_found": "Programs found",
+  "results.annual_savings": "Est. annual savings",
+  "results.cascade_links": "Cascade links",
+
+  "results.likely": "Likely eligible",
+  "results.possible": "Possibly eligible",
+  "results.unlikely": "Unlikely eligible",
+  "results.auto": "Auto-enrolled",
+
+  "results.est_value": "Est. {amount}/year",
+  "results.required_docs": "Required documents",
+  "results.hide_docs": "Hide documents",
+  "results.apply_now": "Apply now",
+  "results.deadline": "Deadline",
+  "results.triggered_by": "Auto-enrolled via",
+  "results.cascade_connector": "enrollment triggers ↓",
+  "results.caseworker_tip": "Caseworker tip",
+
+  "results.cascade_banner_title": "Enrollment cascade detected",
+  "results.warnings_title": "Important Warnings",
+
+  "results.disclaimer": "This is not legal or financial advice. Eligibility assessments are estimates based on publicly available program guidelines. Confirm eligibility directly with each program before applying.",
+  "results.start_over": "Start over",
+
+  "loading.title": "Checking {count} programs across {agencies} agencies...",
+  "loading.msg0": "Verifying current HEAP application window...",
+  "loading.msg1": "Checking income thresholds for this program year...",
+  "loading.msg2": "Evaluating Con Edison & National Grid programs...",
+  "loading.msg3": "Tracing enrollment cascade chains...",
+  "loading.msg4": "Identifying required documents...",
+  "loading.msg5": "Calculating estimated annual savings...",
+  "loading.msg6": "Finalizing your personalized results..."
+}
