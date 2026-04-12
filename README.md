@@ -1,4 +1,4 @@
-# Energy Assistance Navigator — Technical Spec
+# Energy Assistance Navigator
 
 ## Overview
 
