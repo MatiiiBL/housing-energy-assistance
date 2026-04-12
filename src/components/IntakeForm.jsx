@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import LanguageToggle from './LanguageToggle.jsx';
 
 function SectionLabel({ children }) {
   return (
@@ -30,7 +29,18 @@ function Toggle({ checked, onChange, label }) {
   );
 }
 
-const BENEFITS = ['snap', 'medicaid', 'ssi', 'tanf', 'none'];
+const BENEFITS = [
+  'snap',
+  'medicaid',
+  'ssi',
+  'tanf',
+  'heap_regular',
+  'liheap',
+  'wic',
+  'public_assistance',
+  'section8',
+  'none',
+];
 
 const INITIAL_FORM = {
   householdSize: 1,
@@ -47,7 +57,7 @@ const INITIAL_FORM = {
   hasDisabledMember: false,
 };
 
-export default function IntakeForm({ onSubmit, language, onLanguageChange, error, t }) {
+export default function IntakeForm({ onSubmit, language, error, t }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [validationErrors, setValidationErrors] = useState({});
 
@@ -360,16 +370,6 @@ export default function IntakeForm({ onSubmit, language, onLanguageChange, error
             );
           })}
         </div>
-      </div>
-
-      {/* Section F: Language */}
-      <SectionLabel>{t('intake.sectionF')}</SectionLabel>
-
-      <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('intake.language')}
-        </label>
-        <LanguageToggle language={language} onChange={onLanguageChange} t={t} />
       </div>
 
       {/* API error */}

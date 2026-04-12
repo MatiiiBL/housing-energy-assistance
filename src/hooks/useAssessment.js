@@ -18,7 +18,8 @@ export function useAssessment() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Assessment failed. Please try again.');
+        const parts = [data.error, data.debug].filter(Boolean);
+        throw new Error(parts.length ? parts.join(' — ') : 'Assessment failed. Please try again.');
       }
 
       setAssessment(data);

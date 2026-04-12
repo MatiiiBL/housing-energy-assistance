@@ -1,4 +1,7 @@
 {
+  "brand.name": "WattsGood",
+  "brand.slogan": "Unlock Your Energy Savings",
+
   "intake.title": "Find Your Energy Assistance Programs",
   "intake.subtitle": "Answer a few questions to discover every NYC energy assistance program your household qualifies for.",
 
@@ -57,6 +60,11 @@
   "intake.benefits.ssi": "SSI",
   "intake.benefits.tanf": "TANF",
   "intake.benefits.none": "None",
+  "intake.benefits.heap_regular": "HEAP (energy assistance)",
+  "intake.benefits.liheap": "LIHEAP / HEAP application on file",
+  "intake.benefits.wic": "WIC",
+  "intake.benefits.public_assistance": "Cash Assistance (Public Assistance)",
+  "intake.benefits.section8": "Section 8 / Housing Voucher",
 
   "intake.lang.en": "English",
   "intake.lang.es": "Español",
@@ -93,5 +101,26 @@
   "loading.msg3": "Tracing enrollment cascade chains...",
   "loading.msg4": "Identifying required documents...",
   "loading.msg5": "Calculating estimated annual savings...",
-  "loading.msg6": "Finalizing your personalized results..."
+  "loading.msg6": "Finalizing your personalized results...",
+
+  "cascade.sectionTitle": "Your benefit chains",
+  "cascade.bannerTitle": "Cascade unlock detected",
+  "cascade.bannerSubtitle_one": "Applying to one program automatically qualifies you for {count} additional benefit path — no extra income verification required.",
+  "cascade.bannerSubtitle_other": "Applying to one program automatically qualifies you for {count} additional benefit paths — no extra income verification required.",
+  "cascade.additionalValue": "+{value}/yr in additional benefits",
+  "cascade.chainLabel": "Cascade chain",
+  "cascade.unlockSingular": "unlock",
+  "cascade.unlockPlural": "unlocks",
+  "cascade.howToClaim": "How to claim →",
+  "cascade.hideDetails": "Hide details",
+  "cascade.verifyNote": "Verify with a caseworker — rule confirmed but subject to program availability.",
+  "cascade.checkNote": "Confirm eligibility with the program before applying.",
+  "cascade.officialSource": "Official program source →",
+  "cascade.liveUpdate": "Live program context:",
+  "cascade.mechanism.categorical": "Auto-qualifies",
+  "cascade.mechanism.automatic": "Auto-enrolled",
+  "cascade.mechanism.expedited": "Priority access",
+  "cascade.mechanism.fallback": "Unlocks",
+  "cascade.resultsHeadline": "Up to {total}/year",
+  "cascade.resultsSub": "across your programs and cascade unlocks"
 }

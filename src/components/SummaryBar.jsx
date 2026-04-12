@@ -13,8 +13,8 @@ function MetricCard({ label, value, highlight }) {
 }
 
 export default function SummaryBar({ assessment, t }) {
-  const qualifyingCount = assessment.programs.filter(
-    (p) => p.eligibility === 'likely' || p.autoEnrolled
+  const qualifyingCount = (assessment.programs || []).filter(
+    (p) => p.eligibility === 'likely' || p.qualifies === true
   ).length;
 
   const savings = assessment.totalEstimatedAnnualSavings || 0;

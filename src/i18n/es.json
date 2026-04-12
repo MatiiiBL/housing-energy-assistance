@@ -1,4 +1,7 @@
 {
+  "brand.name": "WattsGood",
+  "brand.slogan": "Desbloquee sus ahorros de energía",
+
   "intake.title": "Encuentra Tus Programas de Asistencia Energética",
   "intake.subtitle": "Responde algunas preguntas para descubrir todos los programas de asistencia energética de NYC para los que califica tu hogar.",
 
@@ -57,6 +60,11 @@
   "intake.benefits.ssi": "SSI",
   "intake.benefits.tanf": "TANF",
   "intake.benefits.none": "Ninguno",
+  "intake.benefits.heap_regular": "HEAP (asistencia energética)",
+  "intake.benefits.liheap": "LIHEAP / solicitud HEAP en curso",
+  "intake.benefits.wic": "WIC",
+  "intake.benefits.public_assistance": "Asistencia en efectivo (Asistencia Pública)",
+  "intake.benefits.section8": "Sección 8 / Vale de vivienda",
 
   "intake.lang.en": "English",
   "intake.lang.es": "Español",
@@ -93,5 +101,26 @@
   "loading.msg3": "Rastreando cadenas de inscripción en cascada...",
   "loading.msg4": "Identificando documentos requeridos...",
   "loading.msg5": "Calculando el ahorro anual estimado...",
-  "loading.msg6": "Finalizando tus resultados personalizados..."
+  "loading.msg6": "Finalizando tus resultados personalizados...",
+
+  "cascade.sectionTitle": "Sus cadenas de beneficios",
+  "cascade.bannerTitle": "Desbloqueo en cascada detectado",
+  "cascade.bannerSubtitle_one": "Solicitar un programa lo califica automáticamente para {count} cadena de beneficio adicional — sin verificación de ingresos adicional.",
+  "cascade.bannerSubtitle_other": "Solicitar un programa lo califica automáticamente para {count} cadenas de beneficios adicionales — sin verificación de ingresos adicional.",
+  "cascade.additionalValue": "+{value}/año en beneficios adicionales",
+  "cascade.chainLabel": "Cadena en cascada",
+  "cascade.unlockSingular": "desbloqueo",
+  "cascade.unlockPlural": "desbloqueos",
+  "cascade.howToClaim": "Cómo reclamar →",
+  "cascade.hideDetails": "Ocultar detalles",
+  "cascade.verifyNote": "Verifique con un trabajador social — regla confirmada pero sujeta a disponibilidad del programa.",
+  "cascade.checkNote": "Confirme la elegibilidad con el programa antes de solicitar.",
+  "cascade.officialSource": "Fuente oficial del programa →",
+  "cascade.liveUpdate": "Contexto del programa:",
+  "cascade.mechanism.categorical": "Califica automáticamente",
+  "cascade.mechanism.automatic": "Inscripción automática",
+  "cascade.mechanism.expedited": "Acceso prioritario",
+  "cascade.mechanism.fallback": "Desbloquea",
+  "cascade.resultsHeadline": "Hasta {total}/año",
+  "cascade.resultsSub": "entre sus programas y desbloqueos en cascada"
 }

@@ -1,31 +1,17 @@
+/** Minimal cascade hints for hackathon prototype — keeps tokens low and speeds up the model. */
+const CASCADE_ADDENDUM = `
+Return only a JSON array (no markdown). Each object: programId (one of: heap_regular, heap_emergency, liheap, snap, medicaid, coned_eal, eap_national_grid, nyserda_weatherization, nyserda_empower, hra_home_energy, solar_for_all, heap_cooling, heap_clean_tune, heap_herr), name, qualifies, confidenceLevel (high|medium|low), alreadyEnrolled, eligibility (likely|possible|unlikely), reason, estimatedValue, estimatedAnnualBenefit (number), applicationUrl (or null), requiredDocuments (array), notes (or null). Mirror profile existingBenefits in alreadyEnrolled.
+`;
+
 function buildSystemPrompt(language) {
   const lang = language === 'es' ? 'Spanish (español)' : 'English';
-  return `You are an energy assistance advisor for New York City households. Given a household profile, identify all energy assistance programs they may be eligible for.
+  const base = `NYC energy assistance advisor. Given the household JSON profile, list programs they may qualify for.
 
-Return ONLY a valid JSON array. No explanation, no markdown, no code fences. Start with [ and end with ].
-
-Each element must have exactly these fields:
-{
-  "name": string,
-  "eligibility": "likely" | "possible" | "unlikely",
-  "reason": string (1-2 sentences explaining why this household qualifies or doesn't),
-  "estimatedValue": string (e.g. "$200–$500/year" or "Up to $600 one-time"),
-  "applicationUrl": string | null,
-  "requiredDocuments": string[],
-  "notes": string | null
-}
-
-Programs to evaluate:
-- HEAP Regular Benefit (HRA — heating assistance, income-based)
-- HEAP Emergency Benefit (HRA — requires active shutoff notice)
-- Energy Affordability Program / EAP (Con Edison or National Grid — monthly discount)
-- EmPower+ Weatherization (NYSERDA — free home energy upgrades)
-- Weatherization Assistance Program / WAP (NYS HCR — insulation and efficiency work)
-- EnergyShare (Con Edison / HeartShare — one-time grant, Con Ed customers only)
-- Community Solar Low-Income Track (bill credits, no panels needed)
-- Lifeline Telecom Discount (FCC — phone/internet discount if on SNAP/Medicaid/HEAP)
-
+Return ONLY valid JSON: one array starting with [. No code fences.
+${CASCADE_ADDENDUM}
 Respond in ${lang}.`;
+
+  return base;
 }
 
-module.exports = { buildSystemPrompt };
+module.exports = { buildSystemPrompt, CASCADE_ADDENDUM };

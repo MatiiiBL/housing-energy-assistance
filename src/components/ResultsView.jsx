@@ -1,7 +1,9 @@
 import React from 'react';
+import SummaryBar from './SummaryBar.jsx';
+import CascadeSummary from './CascadeSummary.jsx';
 
 const ELIGIBILITY_STYLES = {
-  likely:   { label: 'Likely',   bg: '#f0fdf8', border: '#86efbf', text: '#126e52', dot: '#1D9E75' },
+  likely: { label: 'Likely', bg: '#f0fdf8', border: '#86efbf', text: '#126e52', dot: '#1D9E75' },
   possible: { label: 'Possible', bg: '#fffbeb', border: '#fde68a', text: '#92400e', dot: '#f59e0b' },
   unlikely: { label: 'Unlikely', bg: '#f9fafb', border: '#e5e7eb', text: '#6b7280', dot: '#9ca3af' },
 };
@@ -15,7 +17,6 @@ function ProgramCard({ program }) {
       className="rounded-xl border p-5"
       style={{ backgroundColor: style.bg, borderColor: style.border }}
     >
-      {/* Header row */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <h2 className="text-base font-semibold text-gray-900">{program.name}</h2>
         <span
@@ -27,24 +28,20 @@ function ProgramCard({ program }) {
         </span>
       </div>
 
-      {/* Reason */}
       <p className="text-sm text-gray-700 mb-3">{program.reason}</p>
 
-      {/* Estimated value */}
       {program.estimatedValue && (
         <p className="text-sm font-medium mb-3" style={{ color: style.text }}>
           Est. value: {program.estimatedValue}
         </p>
       )}
 
-      {/* Notes */}
       {program.notes && (
         <p className="text-xs text-gray-600 bg-white bg-opacity-60 rounded-lg px-3 py-2 mb-3 border border-white">
           {program.notes}
         </p>
       )}
 
-      {/* Required documents (collapsible) */}
       {program.requiredDocuments?.length > 0 && (
         <div className="mb-3">
           <button
@@ -56,7 +53,10 @@ function ProgramCard({ program }) {
             <svg
               className="w-3.5 h-3.5 transition-transform"
               style={{ transform: docsOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}
-              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
@@ -75,7 +75,6 @@ function ProgramCard({ program }) {
         </div>
       )}
 
-      {/* Apply link */}
       {program.applicationUrl && (
         <a
           href={program.applicationUrl}
@@ -86,7 +85,11 @@ function ProgramCard({ program }) {
         >
           Apply Now
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
           </svg>
         </a>
       )}
@@ -94,20 +97,22 @@ function ProgramCard({ program }) {
   );
 }
 
-export default function ResultsView({ assessment, onStartOver }) {
+export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
   const order = { likely: 0, possible: 1, unlikely: 2 };
   const sorted = [...(assessment.programs || [])].sort(
     (a, b) => (order[a.eligibility] ?? 1) - (order[b.eligibility] ?? 1)
   );
 
   const likelyCount = sorted.filter((p) => p.eligibility === 'likely').length;
+  const tb = assessment.totalBaseValue ?? 0;
+  const tc = assessment.totalCascadeValue ?? 0;
+  const totalAnnual = assessment.totalEstimatedAnnualSavings ?? tb + tc;
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Your Results</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{t('results.title')}</h1>
           {likelyCount > 0 && (
             <p className="text-sm text-gray-500 mt-0.5">
               {likelyCount} program{likelyCount !== 1 ? 's' : ''} you likely qualify for
@@ -122,16 +127,37 @@ export default function ResultsView({ assessment, onStartOver }) {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Start Over
+          {t('results.start_over')}
         </button>
       </div>
 
-      {/* Program cards */}
+      <SummaryBar assessment={assessment} t={t} />
+
+      <div className="rounded-xl bg-green-50 border border-green-200 p-5 mb-6">
+        <div className="text-3xl font-bold text-green-800">
+          {t('cascade.resultsHeadline', {
+            total: `$${totalAnnual.toLocaleString()}`,
+          })}
+        </div>
+        <div className="text-green-700 text-sm mt-1">{t('cascade.resultsSub')}</div>
+      </div>
+
+      <CascadeSummary
+        cascadeChains={assessment.cascadeChains}
+        programCatalog={assessment.programCatalog}
+        programs={assessment.programs}
+        totalCascadeValue={tc}
+        liveEnrichment={assessment.liveEnrichment}
+        t={t}
+      />
+
       <div className="space-y-4">
         {sorted.map((program, i) => (
-          <ProgramCard key={i} program={program} />
+          <ProgramCard key={program.programId || i} program={program} />
         ))}
       </div>
+
+      <p className="mt-8 text-xs text-gray-500 leading-relaxed">{t('results.disclaimer')}</p>
 
       <div className="mt-8 text-center">
         <button
@@ -139,7 +165,7 @@ export default function ResultsView({ assessment, onStartOver }) {
           onClick={onStartOver}
           className="px-6 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
-          Start Over
+          {t('results.start_over')}
         </button>
       </div>
     </div>

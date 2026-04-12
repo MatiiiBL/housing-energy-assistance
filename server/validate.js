@@ -24,7 +24,25 @@ const HouseholdProfileSchema = z.object({
     .number()
     .min(0, 'Monthly bill cannot be negative')
     .max(2000, 'Monthly bill seems unusually high'),
-  existingBenefits: z.array(z.enum(['snap', 'medicaid', 'ssi', 'tanf', 'none'])),
+  existingBenefits: z
+    .array(
+      z.enum([
+        'snap',
+        'medicaid',
+        'ssi',
+        'tanf',
+        'none',
+        'heap_regular',
+        'liheap',
+        'wic',
+        'public_assistance',
+        'section8',
+      ])
+    )
+    .refine(
+      (vals) => !vals.includes('none') || vals.length <= 1,
+      'Select specific programs or None, not both'
+    ),
   householdMembers: z.object({
     hasChildUnder6: z.boolean(),
     hasSenior60Plus: z.boolean(),
@@ -45,4 +63,31 @@ function validateProfile(body) {
   return { valid: true, data: result.data };
 }
 
-module.exports = { validateProfile };
+/**
+ * Validates POST /api/assess body. Assessments use Gemini on the server; not configurable per request.
+ */
+function validateAssessRequest(body) {
+  if (body == null || typeof body !== 'object' || Array.isArray(body)) {
+    return {
+      valid: false,
+      errors: [{ field: '_', message: 'Invalid request body' }],
+    };
+  }
+  const profileResult = HouseholdProfileSchema.safeParse(body);
+  if (!profileResult.success) {
+    const errors = profileResult.error.errors.map((e) => ({
+      field: e.path.join('.'),
+      message: e.message,
+    }));
+    return { valid: false, errors };
+  }
+
+  return {
+    valid: true,
+    data: {
+      profile: profileResult.data,
+    },
+  };
+}
+
+module.exports = { validateProfile, validateAssessRequest };
