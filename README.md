@@ -1,3 +1,5 @@
+![download (1)](https://github.com/user-attachments/assets/07f485f4-b355-4b60-bb2f-5a192127179b)
+
 # Energy Assistance Navigator (NYC)
 
 Web app for New York City households to explore energy assistance programs. You fill out a short intake; the backend sends your answers to **Claude (Anthropic)** and returns suggested programs, rough benefit estimates, and links. **This is not eligibility advice**—always confirm rules and deadlines with official sources (e.g. [ACCESS NYC](https://access.nyc.gov/)).
