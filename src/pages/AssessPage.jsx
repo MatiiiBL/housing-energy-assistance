@@ -45,17 +45,18 @@ export default function AssessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-40">
+      <header className="border-b border-slate-200 bg-white/90 backdrop-blur-sm sticky top-0 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <img
               src="/wattsgood-logo.webp"
               alt="WattsGood"
               className="h-10 w-10 object-contain"
+              style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(476%) hue-rotate(107deg) brightness(92%) contrast(88%)' }}
             />
-            <span className="text-white font-bold text-lg tracking-tight group-hover:text-emerald-400 transition-colors">
+            <span className="text-slate-900 font-bold text-lg tracking-tight group-hover:text-emerald-600 transition-colors">
               WattsGood
             </span>
           </Link>
