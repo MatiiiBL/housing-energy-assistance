@@ -64,7 +64,7 @@ export default function AssessPage() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-10">
+      <main className={`mx-auto px-4 py-10 ${view === 'results' ? 'max-w-6xl' : 'max-w-3xl'}`}>
         {view === 'intake' && (
           <IntakeForm
             onSubmit={handleSubmit}
@@ -74,7 +74,7 @@ export default function AssessPage() {
             t={t}
           />
         )}
-        {view === 'loading' && <LoadingSkeleton language={language} t={t} />}
+        {view === 'loading' && <LoadingSkeleton />}
         {view === 'results' && assessment && (
           <ResultsView assessment={assessment} onStartOver={handleStartOver} t={t} />
         )}
