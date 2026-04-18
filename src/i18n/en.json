@@ -121,11 +121,11 @@
   "results.start_over": "Start over",
 
   "loading.title": "Checking {count} programs across {agencies} agencies...",
-  "loading.msg0": "Verifying current HEAP application window...",
-  "loading.msg1": "Checking income thresholds for this program year...",
-  "loading.msg2": "Evaluating Con Edison & National Grid programs...",
-  "loading.msg3": "Tracing enrollment cascade chains...",
-  "loading.msg4": "Identifying required documents...",
+  "loading.msg0": "Checking heat & cooling assistance programs...",
+  "loading.msg1": "Verifying current HEAP application window...",
+  "loading.msg2": "Evaluating Con Edison & National Grid discounts...",
+  "loading.msg3": "Tracing your enrollment cascade chains...",
+  "loading.msg4": "Checking NYSERDA weatherization eligibility...",
   "loading.msg5": "Calculating estimated annual savings...",
   "loading.msg6": "Finalizing your personalized results...",
 

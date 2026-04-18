@@ -43,6 +43,39 @@ const BENEFITS = [
   'none',
 ];
 
+const DEMO_PROFILES = [
+  {
+    label: 'The Bronx Family',
+    description: 'Family of 4 · $38k · SNAP · Con Edison',
+    form: {
+      householdSize: 4, showCustomSize: false, householdSizeCustom: '',
+      annualIncome: '38000', borough: 'bronx', housingType: 'renter_pay_utilities',
+      utilityProvider: 'con_edison', monthlyEnergyBill: 185,
+      existingBenefits: ['snap'], hasChildUnder6: true, hasSenior60Plus: false, hasDisabledMember: false,
+    },
+  },
+  {
+    label: 'Senior on Fixed Income',
+    description: '1 person · $16k · Medicaid + SSI · Brooklyn',
+    form: {
+      householdSize: 1, showCustomSize: false, householdSizeCustom: '',
+      annualIncome: '16000', borough: 'brooklyn', housingType: 'renter_pay_utilities',
+      utilityProvider: 'con_edison', monthlyEnergyBill: 95,
+      existingBenefits: ['medicaid', 'ssi'], hasChildUnder6: false, hasSenior60Plus: true, hasDisabledMember: false,
+    },
+  },
+  {
+    label: 'Working Renter',
+    description: '2 people · $52k · No benefits · Queens',
+    form: {
+      householdSize: 2, showCustomSize: false, householdSizeCustom: '',
+      annualIncome: '52000', borough: 'queens', housingType: 'renter_pay_utilities',
+      utilityProvider: 'con_edison', monthlyEnergyBill: 130,
+      existingBenefits: [], hasChildUnder6: false, hasSenior60Plus: false, hasDisabledMember: false,
+    },
+  },
+];
+
 const INITIAL_FORM = {
   householdSize: 1,
   householdSizeCustom: '',
@@ -67,6 +100,11 @@ export default function IntakeForm({
 }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [validationErrors, setValidationErrors] = useState({});
+
+  const loadPreset = (preset) => {
+    setForm(preset.form);
+    setValidationErrors({});
+  };
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -147,6 +185,26 @@ export default function IntakeForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate>
+      {/* Demo preset profiles */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          Try a demo profile
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {DEMO_PROFILES.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => loadPreset(preset)}
+              className="flex flex-col items-start px-3 py-2 rounded-lg border border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 transition-colors text-left"
+            >
+              <span className="text-xs font-semibold text-gray-800">{preset.label}</span>
+              <span className="text-xs text-gray-500">{preset.description}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('intake.title')}</h1>
         <p className="text-sm text-gray-500">{t('intake.subtitle')}</p>
@@ -346,6 +404,7 @@ export default function IntakeForm({
         />
         <div className="flex justify-between text-xs text-gray-400 mt-1">
           <span>$50</span>
+          <span className="italic">NYC avg: ~$150/mo for renters</span>
           <span>$500</span>
         </div>
       </div>

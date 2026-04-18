@@ -18,6 +18,7 @@ const {
   getQualifiedIdsForCascades,
   sumBaseValue,
   buildProgramCatalog,
+  buildWarnings,
 } = require('./assessHelpers.js');
 
 const app = express();
@@ -91,11 +92,14 @@ app.post('/api/assess', async (req, res) => {
       }
     }
 
+    const warnings = buildWarnings(programs, profile);
+
     return res.json({
       programs,
       llm: { provider: 'claude' },
       cascadeChains,
       liveEnrichment,
+      warnings,
       totalBaseValue,
       totalCascadeValue,
       totalEstimatedAnnualSavings: totalBaseValue + totalCascadeValue,

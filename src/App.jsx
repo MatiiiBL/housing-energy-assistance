@@ -28,6 +28,7 @@ export default function App() {
   const t = createT(language);
 
   const handleSubmit = async (profile) => {
+    reset();
     setView('loading');
     try {
       await assess({ ...profile, language: assessmentLanguage });

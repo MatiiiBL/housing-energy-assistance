@@ -1,6 +1,7 @@
 import React from 'react';
 import SummaryBar from './SummaryBar.jsx';
 import CascadeSummary from './CascadeSummary.jsx';
+import ClimateImpactBanner from './ClimateImpactBanner.jsx';
 
 const ELIGIBILITY_STYLES = {
   likely: { label: 'Likely', bg: '#f0fdf8', border: '#86efbf', text: '#126e52', dot: '#1D9E75' },
@@ -107,10 +108,11 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
   const tb = assessment.totalBaseValue ?? 0;
   const tc = assessment.totalCascadeValue ?? 0;
   const totalAnnual = assessment.totalEstimatedAnnualSavings ?? tb + tc;
+  const warnings = assessment.warnings || [];
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 print:hidden">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">{t('results.title')}</h1>
           {likelyCount > 0 && (
@@ -119,19 +121,39 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
             </p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={onStartOver}
-          className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          {t('results.start_over')}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+            title="Print or save as PDF"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Save PDF
+          </button>
+          <button
+            type="button"
+            onClick={onStartOver}
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {t('results.start_over')}
+          </button>
+        </div>
       </div>
 
+      <ClimateImpactBanner programs={assessment.programs} />
+
       <SummaryBar assessment={assessment} t={t} />
+
+      {/* Community impact context line */}
+      <p className="text-xs text-gray-500 text-center mb-4 italic">
+        In NYC, only 23% of eligible households enroll in HEAP — tools like this can change that.
+      </p>
 
       <div className="rounded-xl bg-green-50 border border-green-200 p-5 mb-6">
         <div className="text-3xl font-bold text-green-800">
@@ -151,6 +173,20 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
         t={t}
       />
 
+      {warnings.length > 0 && (
+        <div className="space-y-3 mb-6">
+          <h3 className="text-sm font-semibold text-amber-800">Important notices</h3>
+          {warnings.map((w, i) => (
+            <div
+              key={i}
+              className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 leading-relaxed"
+            >
+              ⚠️ {w}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-4">
         {sorted.map((program, i) => (
           <ProgramCard key={program.programId || i} program={program} />
@@ -159,7 +195,7 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
 
       <p className="mt-8 text-xs text-gray-500 leading-relaxed">{t('results.disclaimer')}</p>
 
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-center print:hidden">
         <button
           type="button"
           onClick={onStartOver}

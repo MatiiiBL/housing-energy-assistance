@@ -20,6 +20,53 @@ function resolveLocalizedString(value, preferredLocale = 'en') {
   return String(value);
 }
 
+/**
+ * Detect negative interactions between qualified programs and return warning strings.
+ */
+function buildWarnings(programs, profile) {
+  const warnings = [];
+  const qualifiedIds = new Set(
+    (programs || [])
+      .filter((p) => p.qualifies || p.eligibility === 'likely')
+      .map((p) => p.programId)
+  );
+
+  if (qualifiedIds.has('nyserda_weatherization') && qualifiedIds.has('nyserda_empower')) {
+    warnings.push(
+      'WAP (Weatherization Assistance Program) and EmPower+ have overlapping scope. ' +
+        'Applying to both simultaneously may delay processing. We recommend applying to EmPower+ first — it is faster and typically covers more measures.'
+    );
+  }
+
+  if (qualifiedIds.has('heap_emergency')) {
+    warnings.push(
+      'HEAP Emergency Benefit requires an active utility shutoff notice. You cannot apply preemptively — ' +
+        'only apply when you have received a shutoff notice from your utility provider.'
+    );
+  }
+
+  if (qualifiedIds.has('heap_regular')) {
+    warnings.push(
+      'HEAP funding is exhausted every year before the application window closes. Apply as early as possible — typically in November when the season opens.'
+    );
+  }
+
+  if (qualifiedIds.has('heap_cooling')) {
+    const heatVulnerableBorough = ['bronx', 'brooklyn', 'queens'].includes(profile?.borough);
+    const hasVulnerableMember =
+      profile?.householdMembers?.hasSenior60Plus ||
+      profile?.householdMembers?.hasChildUnder6 ||
+      profile?.householdMembers?.hasDisabledMember;
+    if (heatVulnerableBorough || hasVulnerableMember) {
+      warnings.push(
+        'HEAP Cooling Assistance is especially important for this household. Apply as soon as the summer window opens (June) — air conditioner units are distributed on a first-come, first-served basis.'
+      );
+    }
+  }
+
+  return warnings;
+}
+
 const NAME_HINTS = [
   [/heap.*regular|^heap\b(?!.*emergency)/i, 'heap_regular'],
   [/heap.*emergency|emergency.*heap/i, 'heap_emergency'],
@@ -146,4 +193,5 @@ module.exports = {
   sumBaseValue,
   buildProgramCatalog,
   parseEstimatedAnnualBenefit,
+  buildWarnings,
 };

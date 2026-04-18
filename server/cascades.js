@@ -148,6 +148,78 @@ const CASCADE_CHAINS = [
       'Emergency benefit can be added to an in-progress application.',
     sourceUrl: 'https://otda.ny.gov/programs/heap/',
   },
+  {
+    triggerId: 'snap',
+    unlockId: 'lifeline',
+    mechanism: 'categorical',
+    legalBasis:
+      'SNAP enrollment satisfies Lifeline categorical eligibility under FCC rules. ' +
+      'No income documentation required — SNAP award letter is sufficient.',
+    confidenceLevel: 'verified',
+    annualValueDelta: 111,
+    applicationNote:
+      'Apply at lifelinesupport.org or through your phone carrier. ' +
+      'Submit SNAP award letter as proof of eligibility.',
+    sourceUrl: 'https://www.lifelinesupport.org/',
+  },
+  {
+    triggerId: 'medicaid',
+    unlockId: 'lifeline',
+    mechanism: 'categorical',
+    legalBasis:
+      'Medicaid enrollment satisfies Lifeline categorical eligibility under FCC rules.',
+    confidenceLevel: 'verified',
+    annualValueDelta: 111,
+    applicationNote:
+      'Apply at lifelinesupport.org with your Medicaid card or award letter.',
+    sourceUrl: 'https://www.lifelinesupport.org/',
+  },
+  {
+    triggerId: 'heap_regular',
+    unlockId: 'heap_cooling',
+    mechanism: 'automatic',
+    legalBasis:
+      'HEAP-eligible households automatically qualify for HEAP Cooling Assistance ' +
+      'during the summer benefit period (June–August). The same income and ' +
+      'categorical eligibility rules apply. Priority given to seniors 60+, ' +
+      'children under 6, and disabled members.',
+    confidenceLevel: 'verified',
+    annualValueDelta: 200,
+    applicationNote:
+      'Apply for HEAP Cooling through ACCESS HRA during the summer window. ' +
+      'Your existing HEAP eligibility documentation can be reused.',
+    sourceUrl: 'https://access.nyc.gov/',
+  },
+  {
+    triggerId: 'heap_regular',
+    unlockId: 'heap_clean_tune',
+    mechanism: 'expedited',
+    legalBasis:
+      'HEAP approval expedites scheduling for the HEAP Clean & Tune service. ' +
+      'Eligible households receive priority appointment slots for free ' +
+      'heating equipment maintenance.',
+    confidenceLevel: 'verified',
+    annualValueDelta: 300,
+    applicationNote:
+      'Request Clean & Tune service through your HRA HEAP caseworker ' +
+      'or at the HEAP office when applying for regular benefits.',
+    sourceUrl: 'https://access.nyc.gov/',
+  },
+  {
+    triggerId: 'coned_eal',
+    unlockId: 'utility_arrears',
+    mechanism: 'expedited',
+    legalBasis:
+      'Con Edison customers enrolled in the Energy Affordability Program (EAL) ' +
+      'may qualify for utility arrears forgiveness or a structured forgiveness plan. ' +
+      'EAL enrollment establishes the income eligibility pathway for debt relief.',
+    confidenceLevel: 'probable',
+    annualValueDelta: 0,
+    applicationNote:
+      'Contact Con Edison after EAL enrollment to inquire about arrears ' +
+      'forgiveness. Call 1-800-752-6633 and reference your EAL account status.',
+    sourceUrl: 'https://www.coned.com/en/accounts-billing/billing-help/payment-assistance',
+  },
 ];
 
 function buildCascadeMap() {
@@ -161,6 +233,11 @@ function buildCascadeMap() {
 
 /**
  * @param {string[]} qualifiedProgramIds - program / enrollment ids that apply as cascade triggers
+ *
+ * Strategy: walk cascade chains from each qualified trigger. Use path-local visited sets
+ * to prevent cycles within a single chain, but allow the same unlock to appear across
+ * different root chains (e.g. snap→coned_eal and heap_regular→coned_eal are both shown).
+ * Deduplicate resolved chains by their string representation before returning.
  */
 function resolveCascades(qualifiedProgramIds) {
   const ids = Array.isArray(qualifiedProgramIds)
@@ -168,31 +245,43 @@ function resolveCascades(qualifiedProgramIds) {
     : [];
   const map = buildCascadeMap();
   const resolved = [];
-  const visited = new Set(ids);
+  const seenChainKeys = new Set();
 
-  function walk(currentId, path, accumulatedValue) {
+  function walk(currentId, path, accumulatedValue, pathVisited) {
     const nexts = map.get(currentId) || [];
     for (const chain of nexts) {
-      if (visited.has(chain.unlockId)) continue;
-      visited.add(chain.unlockId);
+      if (pathVisited.has(chain.unlockId)) continue; // prevent cycles within this path
       const newPath = [...path, chain];
       const newValue = accumulatedValue + chain.annualValueDelta;
-      resolved.push({
-        path: newPath,
-        rootTrigger: path.length ? path[0].triggerId : currentId,
-        terminalUnlock: chain.unlockId,
-        totalIncrementalValue: newValue,
-        hopCount: newPath.length,
-      });
-      walk(chain.unlockId, newPath, newValue);
+      const chainKey = newPath.map((c) => `${c.triggerId}→${c.unlockId}`).join('|');
+      if (!seenChainKeys.has(chainKey)) {
+        seenChainKeys.add(chainKey);
+        resolved.push({
+          path: newPath,
+          rootTrigger: path.length ? path[0].triggerId : currentId,
+          terminalUnlock: chain.unlockId,
+          totalIncrementalValue: newValue,
+          hopCount: newPath.length,
+        });
+      }
+      walk(chain.unlockId, newPath, newValue, new Set([...pathVisited, chain.unlockId]));
     }
   }
 
   for (const id of ids) {
-    walk(id, [], 0);
+    walk(id, [], 0, new Set([id]));
   }
 
-  return resolved.sort((a, b) => b.totalIncrementalValue - a.totalIncrementalValue);
+  // Deduplicate: keep only the highest-value chain per terminalUnlock
+  const byTerminal = new Map();
+  for (const chain of resolved) {
+    const existing = byTerminal.get(chain.terminalUnlock);
+    if (!existing || chain.totalIncrementalValue > existing.totalIncrementalValue) {
+      byTerminal.set(chain.terminalUnlock, chain);
+    }
+  }
+
+  return [...byTerminal.values()].sort((a, b) => b.totalIncrementalValue - a.totalIncrementalValue);
 }
 
 module.exports = {

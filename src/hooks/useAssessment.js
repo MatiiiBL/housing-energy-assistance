@@ -9,16 +9,34 @@ export function useAssessment() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/assess', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile),
-      });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 120000);
+      let response;
+      try {
+        response = await fetch('/api/assess', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profile),
+          signal: controller.signal,
+        });
+      } catch (fetchErr) {
+        if (fetchErr.name === 'AbortError') {
+          throw new Error('This is taking longer than expected — NYC programs are complex. Please try again.');
+        }
+        throw fetchErr;
+      } finally {
+        clearTimeout(timeout);
+      }
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error('Assessment failed. Please try again.');
+      }
 
       if (!response.ok) {
-        const parts = [data.error, data.debug].filter(Boolean);
+        const parts = [data?.error, data?.debug].filter(Boolean);
         throw new Error(parts.length ? parts.join(' — ') : 'Assessment failed. Please try again.');
       }
 
