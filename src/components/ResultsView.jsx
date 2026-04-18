@@ -17,7 +17,7 @@ function estimateCO2Tons(programs) {
   return (kwh * CO2_KG_PER_KWH) / 1000;
 }
 
-// ── SVG Icons ─────────────────────────────────────────────────────────────────
+// ── Icons ─────────────────────────────────────────────────────────────────────
 
 const Icons = {
   Grid: (p) => (
@@ -76,7 +76,48 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
     </svg>
   ),
+  Check: (p) => (
+    <svg {...p} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  ),
+  Plan: (p) => (
+    <svg {...p} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+    </svg>
+  ),
 };
+
+// ── Executive Summary ─────────────────────────────────────────────────────────
+
+function ExecutiveSummary({ text }) {
+  if (!text) return null;
+  const paragraphs = text.split(/\n\n+|\r\n\r\n+/).filter((p) => p.trim().length > 0);
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+          <Icons.Plan className="w-4 h-4 text-emerald-700" />
+        </div>
+        <div>
+          <h2 className="text-sm font-bold text-slate-900">Your Action Plan</h2>
+          <p className="text-xs text-slate-500">Recommended steps to maximize your benefits</p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="px-6 py-5 space-y-4">
+        {paragraphs.map((para, i) => (
+          <p key={i} className="text-sm text-slate-700 leading-relaxed">
+            {para.trim()}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // ── Metric Card ───────────────────────────────────────────────────────────────
 
@@ -129,11 +170,14 @@ const TIER = {
   },
 };
 
-// ── Full-width horizontal Program Card ────────────────────────────────────────
+// ── Program Card ──────────────────────────────────────────────────────────────
 
 function ProgramCard({ program }) {
   const [docsOpen, setDocsOpen] = useState(false);
   const tier = TIER[program.eligibility] ?? TIER.possible;
+
+  const qualifying = program.qualifyingFactors || [];
+  const disqualifying = program.disqualifyingFactors || [];
 
   return (
     <div className={`bg-white rounded-xl border border-slate-200 border-l-4 ${tier.border} shadow-sm hover:shadow-md transition-all duration-150`}>
@@ -152,42 +196,59 @@ function ProgramCard({ program }) {
           )}
         </div>
 
-        {/* Row 2: reason (left) · actions (right) */}
-        <div className="flex items-start gap-6">
-          {/* Reason + notes */}
-          <div className="flex-1 min-w-0 space-y-2">
-            <p className="text-sm text-slate-500 leading-relaxed">{program.reason}</p>
-            {program.notes && (
-              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
-                <p className="text-xs text-slate-500 leading-relaxed">{program.notes}</p>
-              </div>
-            )}
-          </div>
+        {/* Description — what the program provides */}
+        {program.description && (
+          <p className="text-sm text-slate-700 leading-relaxed mb-3">{program.description}</p>
+        )}
 
-          {/* Action buttons */}
-          <div className="flex-shrink-0 flex flex-col items-end gap-2 pt-0.5">
-            {program.requiredDocuments?.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setDocsOpen((o) => !o)}
-                className="flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
-              >
-                <Icons.Doc className="w-3.5 h-3.5" />
-                {docsOpen ? 'Hide docs' : `Documents (${program.requiredDocuments.length})`}
-              </button>
-            )}
-            {program.applicationUrl && (
-              <a
-                href={program.applicationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Apply Now
-                <Icons.External className="w-3 h-3" />
-              </a>
-            )}
+        {/* Qualifying / disqualifying bullets */}
+        {(qualifying.length > 0 || disqualifying.length > 0) && (
+          <div className="space-y-1.5 mb-3">
+            {qualifying.map((f, i) => (
+              <div key={`q-${i}`} className="flex items-start gap-2">
+                <Icons.Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <span className="text-xs text-slate-600 leading-snug">{f}</span>
+              </div>
+            ))}
+            {disqualifying.map((f, i) => (
+              <div key={`d-${i}`} className="flex items-start gap-2">
+                <Icons.Warning className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <span className="text-xs text-slate-500 leading-snug">{f}</span>
+              </div>
+            ))}
           </div>
+        )}
+
+        {/* Notes */}
+        {program.notes && (
+          <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 mb-3">
+            <p className="text-xs text-slate-500 leading-relaxed">{program.notes}</p>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
+          {program.requiredDocuments?.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setDocsOpen((o) => !o)}
+              className="flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <Icons.Doc className="w-3.5 h-3.5" />
+              {docsOpen ? 'Hide docs' : `Documents (${program.requiredDocuments.length})`}
+            </button>
+          )}
+          {program.applicationUrl && (
+            <a
+              href={program.applicationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              Apply Now
+              <Icons.External className="w-3 h-3" />
+            </a>
+          )}
         </div>
       </div>
 
@@ -227,7 +288,7 @@ function ProgramSection({ tier, programs }) {
   );
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
   const [showCascades, setShowCascades] = useState(false);
@@ -285,7 +346,10 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
       {/* Climate banner */}
       <ClimateImpactBanner programs={programs} />
 
-      {/* Metric cards — 4 across */}
+      {/* ── Executive Summary (first prominent section) ── */}
+      <ExecutiveSummary text={assessment.executiveSummary} />
+
+      {/* Metric cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <MetricCard
           Icon={Icons.Grid}
@@ -310,7 +374,7 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
         />
         <MetricCard
           Icon={Icons.Leaf}
-          label="CO2 Avoided"
+          label="CO\u2082 Avoided"
           value={co2Label}
           gradient="bg-gradient-to-br from-emerald-700 to-teal-900"
           sub={co2Tons > 0 ? 'per year (EPA estimate)' : 'no qualifying programs'}
@@ -322,25 +386,12 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
         In NYC, only 23% of eligible households enroll in HEAP — tools like this can change that.
       </p>
 
-      {/* Warnings */}
-      {warnings.length > 0 && (
-        <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 overflow-hidden divide-y divide-amber-100">
-          <div className="flex items-center gap-2 px-5 py-3">
-            <Icons.Warning className="w-4 h-4 text-amber-600" />
-            <span className="text-xs font-bold text-amber-800 uppercase tracking-wide">Important notices</span>
-          </div>
-          {warnings.map((w, i) => (
-            <div key={i} className="px-5 py-3 text-sm text-amber-800 leading-relaxed">{w}</div>
-          ))}
-        </div>
-      )}
-
-      {/* Program sections */}
+      {/* ── Program sections (all visible, no collapse) ── */}
       <ProgramSection tier="likely"   programs={likelyPrograms} />
       <ProgramSection tier="possible" programs={possiblePrograms} />
       <ProgramSection tier="unlikely" programs={unlikelyPrograms} />
 
-      {/* Cascade chains — collapsed */}
+      {/* ── Cascade chains — collapsed (complex detail) ── */}
       {cascadeCount > 0 && (
         <div className="mb-8">
           <button
@@ -377,6 +428,19 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
               />
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Warnings ── */}
+      {warnings.length > 0 && (
+        <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 overflow-hidden divide-y divide-amber-100">
+          <div className="flex items-center gap-2 px-5 py-3">
+            <Icons.Warning className="w-4 h-4 text-amber-600" />
+            <span className="text-xs font-bold text-amber-800 uppercase tracking-wide">Important notices</span>
+          </div>
+          {warnings.map((w, i) => (
+            <div key={i} className="px-5 py-3 text-sm text-amber-800 leading-relaxed">{w}</div>
+          ))}
         </div>
       )}
 

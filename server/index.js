@@ -45,7 +45,7 @@ app.post('/api/assess', async (req, res) => {
 
   const assessTimeoutMs = Number(process.env.ASSESS_TIMEOUT_MS);
   const timeoutMs =
-    Number.isFinite(assessTimeoutMs) && assessTimeoutMs > 0 ? assessTimeoutMs : 120000;
+    Number.isFinite(assessTimeoutMs) && assessTimeoutMs > 0 ? assessTimeoutMs : 1000000;
 
   const timeoutPromise = new Promise((_, reject) =>
     setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs)
@@ -56,7 +56,8 @@ app.post('/api/assess', async (req, res) => {
       runAssessmentModel(systemPrompt, userMessage),
       timeoutPromise,
     ]);
-    const programs = normalizeProgramsFromLLM(output, profile.language);
+    const { programs: rawPrograms, executiveSummary = null } = output;
+    const programs = normalizeProgramsFromLLM(rawPrograms, profile.language);
     const allTriggerIds = getQualifiedIdsForCascades(programs, profile);
     const cascadeChains = resolveCascades(allTriggerIds);
     const totalBaseValue = sumBaseValue(programs);
@@ -96,6 +97,7 @@ app.post('/api/assess', async (req, res) => {
 
     return res.json({
       programs,
+      executiveSummary,
       llm: { provider: 'claude' },
       cascadeChains,
       liveEnrichment,
