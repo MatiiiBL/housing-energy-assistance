@@ -27,7 +27,7 @@ function buildWarnings(programs, profile) {
   const warnings = [];
   const qualifiedIds = new Set(
     (programs || [])
-      .filter((p) => p.qualifies || p.eligibility === 'likely')
+      .filter((p) => p.eligibility !== 'unlikely' && (p.qualifies || p.eligibility === 'likely'))
       .map((p) => p.programId)
   );
 
@@ -115,10 +115,13 @@ function normalizeProgramsFromLLM(raw, language = 'en') {
   const arr = Array.isArray(raw) ? raw : [];
   return arr.map((p, index) => {
     const eligibility = p.eligibility || 'possible';
+    // eligibility:'unlikely' always overrides qualifies — prevents LLM contradictions
+    // from leaking into cascade triggers and metric counts.
     const qualifies =
-      p.qualifies === true ||
-      p.confidenceLevel === 'high' ||
-      (eligibility === 'likely' && p.confidenceLevel !== 'low');
+      eligibility !== 'unlikely' &&
+      (p.qualifies === true ||
+        p.confidenceLevel === 'high' ||
+        (eligibility === 'likely' && p.confidenceLevel !== 'low'));
     const programId =
       p.programId || guessProgramId(p.name) || `unknown_${index}`;
     let estimatedAnnualBenefit =
@@ -156,9 +159,10 @@ function getQualifiedIdsForCascades(programs, profile) {
   for (const p of programs || []) {
     if (!p.programId || String(p.programId).startsWith('unknown_')) continue;
     const high =
-      p.qualifies === true ||
-      p.confidenceLevel === 'high' ||
-      (p.eligibility === 'likely' && p.confidenceLevel !== 'low');
+      p.eligibility !== 'unlikely' &&
+      (p.qualifies === true ||
+        p.confidenceLevel === 'high' ||
+        (p.eligibility === 'likely' && p.confidenceLevel !== 'low'));
     if (high) ids.add(p.programId);
     if (p.alreadyEnrolled) ids.add(p.programId);
   }

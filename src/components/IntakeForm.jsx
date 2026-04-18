@@ -2,11 +2,11 @@ import { useState } from 'react';
 import ASSESSMENT_LANGUAGE_CODES from '../../server/assessmentLanguages.json';
 
 const STEPS = [
-  { id: 'household', label: 'Household' },
-  { id: 'income', label: 'Income' },
-  { id: 'home', label: 'Home' },
-  { id: 'energy', label: 'Energy' },
-  { id: 'benefits', label: 'Benefits' },
+  { id: 'household' },
+  { id: 'income' },
+  { id: 'home' },
+  { id: 'energy' },
+  { id: 'benefits' },
 ];
 
 const BOROUGHS = ['bronx', 'brooklyn', 'manhattan', 'queens', 'staten_island'];
@@ -65,7 +65,7 @@ const INITIAL_FORM = {
   hasDisabledMember: false,
 };
 
-function StepIndicator({ current }) {
+function StepIndicator({ current, t }) {
   return (
     <div className="flex items-center justify-center gap-0 mb-8">
       {STEPS.map((step, i) => {
@@ -92,7 +92,7 @@ function StepIndicator({ current }) {
                 )}
               </div>
               <span className={`text-xs mt-1 font-medium hidden sm:block ${active ? 'text-emerald-600' : done ? 'text-slate-400' : 'text-slate-300'}`}>
-                {step.label}
+                {t(`intake.step.${step.id}`)}
               </span>
             </div>
             {i < STEPS.length - 1 && (
@@ -190,19 +190,19 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
     switch (step) {
       case 0: {
         const size = form.showCustomSize ? parseInt(form.householdSizeCustom, 10) : form.householdSize;
-        if (!size || size < 1) return 'Please select your household size.';
+        if (!size || size < 1) return t('intake.validation.size');
         return '';
       }
       case 1:
         if (!form.annualIncome || isNaN(Number(form.annualIncome.replace(/,/g, ''))))
-          return 'Please enter your annual household income.';
+          return t('intake.validation.income');
         return '';
       case 2:
-        if (!form.borough) return 'Please select your borough.';
-        if (!form.housingType) return 'Please select your housing type.';
+        if (!form.borough) return t('intake.validation.borough');
+        if (!form.housingType) return t('intake.validation.housing');
         return '';
       case 3:
-        if (!form.utilityProvider) return 'Please select your utility provider.';
+        if (!form.utilityProvider) return t('intake.validation.utility');
         return '';
       default:
         return '';
@@ -247,10 +247,6 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
     <div className="max-w-xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-1.5 mb-4">
-          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="text-xs font-semibold text-emerald-700 tracking-wide uppercase">Free Eligibility Check</span>
-        </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">{t('intake.title')}</h1>
         <p className="text-slate-500 text-sm">{t('intake.subtitle')}</p>
       </div>
@@ -265,7 +261,7 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
           <svg className={`w-4 h-4 transition-transform ${showPresets ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          Try a demo profile
+          {t('intake.demo.try')}
         </button>
         {showPresets && (
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -287,17 +283,17 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
 
       {/* Card */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-        <StepIndicator current={step} />
+        <StepIndicator current={step} t={t} />
 
         <form onSubmit={handleSubmit} noValidate>
           {/* Step 0: Household */}
           {step === 0 && (
             <div>
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Who's in your household?</h2>
-              <p className="text-sm text-slate-500 mb-6">Count everyone who lives with you, including yourself.</p>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">{t('intake.step0.title')}</h2>
+              <p className="text-sm text-slate-500 mb-6">{t('intake.step0.subtitle')}</p>
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Household size</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">{t('intake.step0.sizeLabel')}</label>
                 <div className="flex gap-2 flex-wrap">
                   {[1, 2, 3, 4].map((size) => (
                     <button
@@ -331,7 +327,7 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
                       max="20"
                       value={form.householdSizeCustom}
                       onChange={(e) => set('householdSizeCustom', e.target.value)}
-                      placeholder="Exact #"
+                      placeholder={t('intake.step0.exactPlaceholder')}
                       className="w-24 rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500"
                     />
                   )}
@@ -339,25 +335,25 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
               </div>
 
               <div className="mb-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Does your household include any of the following?</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">{t('intake.step0.membersLabel')}</label>
                 <div className="space-y-2">
                   <Toggle
                     checked={form.hasChildUnder6}
                     onChange={(v) => set('hasChildUnder6', v)}
                     label={t('intake.childUnder6')}
-                    sublabel="Children under 6 may unlock additional benefits"
+                    sublabel={t('intake.step0.child.sublabel')}
                   />
                   <Toggle
                     checked={form.hasSenior60Plus}
                     onChange={(v) => set('hasSenior60Plus', v)}
                     label={t('intake.senior60Plus')}
-                    sublabel="Seniors 60+ qualify for priority HEAP access"
+                    sublabel={t('intake.step0.senior.sublabel')}
                   />
                   <Toggle
                     checked={form.hasDisabledMember}
                     onChange={(v) => set('hasDisabledMember', v)}
                     label={t('intake.disabledMember')}
-                    sublabel="Disability status may expand your eligibility"
+                    sublabel={t('intake.step0.disabled.sublabel')}
                   />
                 </div>
               </div>
@@ -367,8 +363,8 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
           {/* Step 1: Income */}
           {step === 1 && (
             <div>
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Annual household income</h2>
-              <p className="text-sm text-slate-500 mb-6">Include all sources before taxes — wages, Social Security, benefits, etc.</p>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">{t('intake.step1.title')}</h2>
+              <p className="text-sm text-slate-500 mb-6">{t('intake.step1.subtitle')}</p>
 
               <div className="relative mb-4">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg font-semibold">$</span>
@@ -381,29 +377,26 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
                   className="block w-full rounded-xl border-2 border-slate-200 pl-9 pr-4 py-4 text-lg font-semibold text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
-              <p className="text-xs text-slate-400">Most NYC energy programs serve households earning up to 80% of Area Median Income (~$77k for a family of 4).</p>
+              <p className="text-xs text-slate-400">{t('intake.step1.helper')}</p>
 
               {/* Income bracket hints */}
               <div className="mt-6 grid grid-cols-3 gap-2">
                 {[
-                  { label: 'Under $20k', sub: 'All programs likely open', color: 'emerald' },
-                  { label: '$20k–$50k', sub: 'Most programs apply', color: 'emerald' },
-                  { label: '$50k–$80k', sub: 'Some programs apply', color: 'amber' },
+                  { labelKey: 'intake.step1.tier1.label', subKey: 'intake.step1.tier1.sub', value: '18000', color: 'emerald' },
+                  { labelKey: 'intake.step1.tier2.label', subKey: 'intake.step1.tier2.sub', value: '35000', color: 'emerald' },
+                  { labelKey: 'intake.step1.tier3.label', subKey: 'intake.step1.tier3.sub', value: '60000', color: 'amber' },
                 ].map((tier) => (
                   <div
-                    key={tier.label}
+                    key={tier.labelKey}
                     className={`p-3 rounded-xl border text-center cursor-pointer transition-colors ${
                       tier.color === 'emerald'
                         ? 'border-emerald-100 bg-emerald-50/60'
                         : 'border-amber-100 bg-amber-50/60'
                     }`}
-                    onClick={() => {
-                      const values = { 'Under $20k': '18000', '$20k–$50k': '35000', '$50k–$80k': '60000' };
-                      set('annualIncome', values[tier.label]);
-                    }}
+                    onClick={() => set('annualIncome', tier.value)}
                   >
-                    <div className={`text-xs font-bold ${tier.color === 'emerald' ? 'text-emerald-700' : 'text-amber-700'}`}>{tier.label}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">{tier.sub}</div>
+                    <div className={`text-xs font-bold ${tier.color === 'emerald' ? 'text-emerald-700' : 'text-amber-700'}`}>{t(tier.labelKey)}</div>
+                    <div className="text-xs text-slate-500 mt-0.5">{t(tier.subKey)}</div>
                   </div>
                 ))}
               </div>
@@ -413,11 +406,11 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
           {/* Step 2: Home */}
           {step === 2 && (
             <div>
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Where do you live?</h2>
-              <p className="text-sm text-slate-500 mb-6">Some programs are borough-specific or have local application offices.</p>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">{t('intake.step2.title')}</h2>
+              <p className="text-sm text-slate-500 mb-6">{t('intake.step2.subtitle')}</p>
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Borough</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">{t('intake.step2.boroughLabel')}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {BOROUGHS.map((b) => (
                     <CardOption key={b} selected={form.borough === b} onClick={() => set('borough', b)}>
@@ -428,20 +421,20 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Housing type</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">{t('intake.step2.housingLabel')}</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
-                    { key: 'renter_heat_included', icon: '🏢', sub: 'Heat included in rent' },
-                    { key: 'renter_pay_utilities', icon: '🔌', sub: 'I pay my own utilities' },
-                    { key: 'homeowner', icon: '🏡', sub: 'I own my home' },
-                    { key: 'public_housing', icon: '🏛️', sub: 'NYCHA / public housing' },
-                  ].map(({ key, icon, sub }) => (
+                    { key: 'renter_heat_included', icon: '🏢' },
+                    { key: 'renter_pay_utilities', icon: '🔌' },
+                    { key: 'homeowner', icon: '🏡' },
+                    { key: 'public_housing', icon: '🏛️' },
+                  ].map(({ key, icon }) => (
                     <CardOption key={key} selected={form.housingType === key} onClick={() => set('housingType', key)}>
                       <div className="flex items-center gap-2">
                         <span className="text-xl">{icon}</span>
                         <div>
                           <div className="text-sm font-semibold text-slate-800">{t(`intake.housing.${key}`)}</div>
-                          <div className="text-xs text-slate-500">{sub}</div>
+                          <div className="text-xs text-slate-500">{t(`intake.housing.${key}.sub`)}</div>
                         </div>
                       </div>
                     </CardOption>
@@ -454,24 +447,24 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
           {/* Step 3: Energy */}
           {step === 3 && (
             <div>
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Your energy setup</h2>
-              <p className="text-sm text-slate-500 mb-6">This helps us find utility-specific discounts and rebates.</p>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">{t('intake.step3.title')}</h2>
+              <p className="text-sm text-slate-500 mb-6">{t('intake.step3.subtitle')}</p>
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Utility provider</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">{t('intake.step3.providerLabel')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { key: 'con_edison', icon: '⚡', sub: 'Serves most of NYC' },
-                    { key: 'national_grid', icon: '🔥', sub: 'Gas service provider' },
-                    { key: 'nyseg', icon: '🌐', sub: 'Upstate & some boroughs' },
-                    { key: 'other', icon: '❓', sub: 'Other or unknown' },
-                  ].map(({ key, icon, sub }) => (
+                    { key: 'con_edison', icon: '⚡' },
+                    { key: 'national_grid', icon: '🔥' },
+                    { key: 'nyseg', icon: '🌐' },
+                    { key: 'other', icon: '❓' },
+                  ].map(({ key, icon }) => (
                     <CardOption key={key} selected={form.utilityProvider === key} onClick={() => set('utilityProvider', key)}>
                       <div className="flex items-center gap-2">
                         <span className="text-xl">{icon}</span>
                         <div>
                           <div className="text-sm font-semibold text-slate-800">{t(`intake.utility.${key}`)}</div>
-                          <div className="text-xs text-slate-500">{sub}</div>
+                          <div className="text-xs text-slate-500">{t(`intake.utility.${key}.sub`)}</div>
                         </div>
                       </div>
                     </CardOption>
@@ -481,10 +474,10 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Estimated monthly energy bill:{' '}
+                  {t('intake.step3.billLabel')}{' '}
                   <span className="text-emerald-600">${form.monthlyEnergyBill}/mo</span>
                 </label>
-                <p className="text-xs text-slate-400 mb-3">Your best estimate — doesn't need to be exact.</p>
+                <p className="text-xs text-slate-400 mb-3">{t('intake.step3.billHelper')}</p>
                 <input
                   type="range"
                   min="50"
@@ -496,7 +489,7 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
                 />
                 <div className="flex justify-between text-xs text-slate-400 mt-1">
                   <span>$50</span>
-                  <span className="text-slate-500 italic">NYC avg: ~$150/mo</span>
+                  <span className="text-slate-500 italic">{t('intake.step3.billAvg')}</span>
                   <span>$500</span>
                 </div>
               </div>
@@ -506,11 +499,11 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
           {/* Step 4: Benefits & Language */}
           {step === 4 && (
             <div>
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Current benefits & preferences</h2>
-              <p className="text-sm text-slate-500 mb-5">Existing benefits can automatically qualify you for additional programs — no extra applications needed.</p>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">{t('intake.step4.title')}</h2>
+              <p className="text-sm text-slate-500 mb-5">{t('intake.step4.subtitle')}</p>
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Programs you're currently enrolled in</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">{t('intake.step4.enrolledLabel')}</label>
                 <div className="flex flex-wrap gap-2">
                   {BENEFITS.map((benefit) => {
                     const selected = form.existingBenefits.includes(benefit);
@@ -534,9 +527,9 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
 
               <div className="border-t border-slate-100 pt-5">
                 <label className="block text-sm font-semibold text-slate-700 mb-1" htmlFor="assessment-language">
-                  Preferred language for results
+                  {t('intake.step4.langLabel')}
                 </label>
-                <p className="text-xs text-slate-400 mb-2">Program details from the AI assistant will use this language.</p>
+                <p className="text-xs text-slate-400 mb-2">{t('intake.step4.langHelper')}</p>
                 <select
                   id="assessment-language"
                   value={assessmentLanguage}
@@ -578,7 +571,7 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
                 onClick={prevStep}
                 className="px-6 py-3 rounded-xl border-2 border-slate-200 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all"
               >
-                ← Back
+                {t('intake.nav.back')}
               </button>
             )}
             {step < STEPS.length - 1 ? (
@@ -587,7 +580,7 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
                 onClick={nextStep}
                 className="flex-1 sm:flex-none sm:px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-sm transition-all"
               >
-                Continue →
+                {t('intake.nav.continue')}
               </button>
             ) : (
               <button
@@ -603,7 +596,7 @@ export default function IntakeForm({ onSubmit, assessmentLanguage, onAssessmentL
 
       {/* Footer note */}
       <p className="text-center text-xs text-slate-400 mt-4">
-        Your information is used only to check eligibility. We don't store or share your data.
+        {t('intake.footer')}
       </p>
     </div>
   );

@@ -10,7 +10,7 @@ export function useAssessment() {
     setError(null);
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 120000);
+      const timeout = setTimeout(() => controller.abort(), 1000000);
       let response;
       try {
         response = await fetch('/api/assess', {

@@ -60,9 +60,9 @@ function Navbar() {
       <div className="max-w-6xl mx-auto px-6 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <img
-            src="/wattsgood-logo.webp"
+            src="/wattsgood-logo.png"
             alt="WattsGood"
-            className="h-8 w-8 object-contain"
+            className="h-20 w-20 object-contain"
             style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(476%) hue-rotate(107deg) brightness(92%) contrast(88%)' }}
           />
           <span className="text-slate-900 font-bold text-lg tracking-tight">WattsGood</span>
@@ -93,37 +93,10 @@ function Hero() {
     <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 bg-white overflow-hidden">
       <HeroOrbs />
 
-      <motion.div style={{ y, opacity }} className="relative z-10 max-w-4xl mx-auto">
-        {/* Logo */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.55 }}
-          className="mb-8 flex justify-center"
-        >
-          <div className="relative p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
-            <img
-              src="/wattsgood-logo.webp"
-              alt="WattsGood"
-              className="h-16 w-16 object-contain"
-              style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(476%) hue-rotate(107deg) brightness(92%) contrast(88%)' }}
-            />
-          </div>
-        </motion.div>
+<motion.div style={{ y, opacity }} className="relative z-10 max-w-4xl mx-auto mt-16">
 
         {/* Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.15 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-medium mb-6"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
-          </span>
-          Free NYC Energy Assistance Navigator
-        </motion.div>
+        
 
         {/* Headline */}
         <motion.h1
@@ -193,24 +166,7 @@ function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Scroll cue */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 7, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="flex flex-col items-center gap-1.5 text-slate-400"
-        >
-          <span className="text-xs tracking-widest uppercase font-medium">Scroll</span>
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </motion.div>
-      </motion.div>
+      
     </section>
   );
 }
@@ -589,7 +545,7 @@ function Footer() {
           <div className="flex flex-col items-center md:items-start gap-3 max-w-xs text-center md:text-left">
             <div className="flex items-center gap-2.5">
               <img
-                src="/wattsgood-logo.webp"
+                src="/wattsgood-logo.png"
                 alt="WattsGood"
                 className="h-8 w-8 object-contain"
                 style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(476%) hue-rotate(107deg) brightness(92%) contrast(88%)' }}

@@ -374,7 +374,7 @@ export default function ResultsView({ assessment, onStartOver, t = (k) => k }) {
         />
         <MetricCard
           Icon={Icons.Leaf}
-          label="CO\u2082 Avoided"
+          label="CO2 Avoided"
           value={co2Label}
           gradient="bg-gradient-to-br from-emerald-700 to-teal-900"
           sub={co2Tons > 0 ? 'per year (EPA estimate)' : 'no qualifying programs'}

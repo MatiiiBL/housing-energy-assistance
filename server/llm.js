@@ -60,32 +60,85 @@ function parseJsonLenient(slice) {
 /**
  * Closes unclosed strings, brackets, and braces so a truncated JSON response
  * can be parsed partially rather than failing entirely.
+ *
+ * Also handles the two "dangling key" cases that the naive version misses:
+ *   1. Truncation mid-key:   {"name": "HEAP", "descri         → "descri": null
+ *   2. Truncation after key: {"name": "HEAP", "description"   → "description": null
  */
 function repairTruncatedJson(raw) {
   const text = stripFences(raw).trimEnd();
   let inString = false;
   let escape = false;
+  let currentStringIsKey = false;      // true while reading a key inside an object
+  let lastCompletedStringWasKey = false; // key was written but no ':' seen yet
+  // Each stack frame: { closer: '}' | ']', expectsKey: bool }
   const stack = [];
 
   for (let i = 0; i < text.length; i++) {
     const c = text[i];
+
     if (escape) { escape = false; continue; }
+
     if (inString) {
       if (c === '\\') { escape = true; continue; }
-      if (c === '"') inString = false;
+      if (c === '"') {
+        inString = false;
+        if (currentStringIsKey) {
+          lastCompletedStringWasKey = true;
+          if (stack.length > 0) stack[stack.length - 1].expectsKey = false;
+        }
+        currentStringIsKey = false;
+      }
       continue;
     }
-    if (c === '"') { inString = true; continue; }
-    if (c === '{' || c === '[') stack.push(c === '{' ? '}' : ']');
-    else if (c === '}' || c === ']') {
-      if (stack.length > 0 && stack[stack.length - 1] === c) stack.pop();
+
+    // Outside string
+    if (c === '"') {
+      inString = true;
+      lastCompletedStringWasKey = false;
+      currentStringIsKey =
+        stack.length > 0 &&
+        stack[stack.length - 1].closer === '}' &&
+        stack[stack.length - 1].expectsKey;
+      continue;
+    }
+
+    if (c === ' ' || c === '\n' || c === '\r' || c === '\t') continue;
+
+    if (c === '{') {
+      stack.push({ closer: '}', expectsKey: true });
+      lastCompletedStringWasKey = false;
+    } else if (c === '[') {
+      stack.push({ closer: ']', expectsKey: false });
+      lastCompletedStringWasKey = false;
+    } else if (c === ':') {
+      lastCompletedStringWasKey = false;
+    } else if (c === ',') {
+      lastCompletedStringWasKey = false;
+      if (stack.length > 0 && stack[stack.length - 1].closer === '}') {
+        stack[stack.length - 1].expectsKey = true;
+      }
+    } else if (c === '}' || c === ']') {
+      lastCompletedStringWasKey = false;
+      if (stack.length > 0 && stack[stack.length - 1].closer === c) stack.pop();
     }
   }
 
   let result = text;
-  if (inString) result += '"';        // close open string
-  while (stack.length > 0) result += stack.pop(); // close open structures
-  return result;
+
+  if (inString) {
+    result += '"';
+    if (currentStringIsKey) result += ': null'; // dangling key mid-string
+  } else if (lastCompletedStringWasKey) {
+    result += ': null'; // key closed but no ':' or value written
+  }
+
+  // Strip any trailing comma before we close structures
+  result = result.trimEnd().replace(/,\s*$/, '');
+
+  while (stack.length > 0) result += stack.pop().closer;
+
+  return stripTrailingCommas(result);
 }
 
 /**

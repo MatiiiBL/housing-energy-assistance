@@ -51,7 +51,7 @@ export default function AssessPage() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <img
-              src="/wattsgood-logo.webp"
+              src="/wattsgood-logo.png"
               alt="WattsGood"
               className="h-10 w-10 object-contain"
               style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(476%) hue-rotate(107deg) brightness(92%) contrast(88%)' }}
